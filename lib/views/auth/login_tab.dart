@@ -61,11 +61,9 @@ class _LoginTabState extends State<LoginTab> {
     super.dispose();
   }
 
-// dart
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
       child: Container(
         color: Colors.blueGrey[50],
         child: Padding(
@@ -74,7 +72,6 @@ class _LoginTabState extends State<LoginTab> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Input Fields Section
                 const SizedBox(height: 40),
                 CustomInputField(
                   labelText: "Enter your email",
@@ -143,52 +140,40 @@ class _LoginTabState extends State<LoginTab> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                // Social Login Icons Section moved to the bottom
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Google Login Icon
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withValues(alpha: 0.3),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: IconButton(
-                        icon: const Icon(Icons.g_mobiledata, size: 32, color: Colors.black),
-                        onPressed: () {
-                          // Add Google login logic
-                        },
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueGrey[50],
+                      padding: const EdgeInsets.symmetric(vertical: 11),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side: BorderSide(color: Colors.black45, width: 2),
                       ),
                     ),
-                    const SizedBox(width: 16),
-                    // Apple Login Icon
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withValues(alpha: 0.3),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: IconButton(
-                        icon: const Icon(Icons.apple, size: 32, color: Colors.black),
-                        onPressed: () {
-                          // Add Apple login logic
-                        },
+                    onPressed: () {
+                      // Add Google login logic
+                    },
+                    child: const Icon(Icons.g_mobiledata, size: 32, color: Colors.black),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueGrey[50],
+                      padding: const EdgeInsets.symmetric(vertical: 11),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side: BorderSide(color: Colors.black45, width: 2),
                       ),
                     ),
-                  ],
+                    onPressed: () {
+                      // Add Apple login logic
+                    },
+                    child: const Icon(Icons.apple, size: 32, color: Colors.black),
+                  ),
                 ),
                 const SizedBox(height: 16),
                 RichText(

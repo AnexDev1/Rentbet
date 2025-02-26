@@ -3,12 +3,15 @@ import 'package:rentbet/views/auth/signup_tab.dart';
 import 'login_tab.dart';
 
 class AuthPage extends StatelessWidget {
-  const AuthPage({Key? key}) : super(key: key);
+  final bool showSignup;
+
+  const AuthPage({Key? key, this.showSignup = false}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
+      initialIndex: showSignup ? 1 : 0,
       child: Scaffold(
         backgroundColor: Colors.white,
         body: SafeArea(
@@ -22,7 +25,6 @@ class AuthPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              //add text that says welcome to Rentbet
               const Text(
                 "Welcome to RentBet",
                 style: TextStyle(
@@ -32,7 +34,6 @@ class AuthPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 40.0),
                 child: Text(

@@ -165,7 +165,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 32, vertical: 12),
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => const AuthPage(showSignup: true,)));
+                          },
                           child: const Text(
                             r"Join",
                             style:
