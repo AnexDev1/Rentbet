@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
+import 'package:rentbet/views/onboarding/onboarding_page.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,12 +19,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
+
       title: 'Flutter Demo',
       theme: ThemeData(
-
         useMaterial3: true,
       ),
-      home: Text('hello world')
+      home: OnboardingPage(),
     );
   }
 }
