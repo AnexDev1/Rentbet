@@ -1,6 +1,7 @@
-// dart
 import 'package:flutter/material.dart';
 import 'package:rentbet/common/widgets/custom_inputfield.dart';
+import 'package:rentbet/services/auth_service.dart';
+import 'package:rentbet/views/listings/listings_page.dart';
 
 class SignupTab extends StatefulWidget {
   const SignupTab({Key? key}) : super(key: key);
@@ -10,22 +11,75 @@ class SignupTab extends StatefulWidget {
 }
 
 class _SignupTabState extends State<SignupTab> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _termsAccepted = false;
+  bool _isLoading = false;
+  final AuthService _authService = AuthService();
 
-  // Helper widget to build criteria row.
-  Widget _buildCriteriaRow(String text) {
-    return Row(
-      children: [
-        const Icon(Icons.check, color: Colors.green, size: 20),
-        const SizedBox(width: 8),
-        Text(
-          text,
-          style: const TextStyle(fontSize: 13, color: Colors.black54),
-        ),
-      ],
-    );
+
+  Future<void> _signup() async {
+    final String name = _nameController.text.trim();
+    final String email = _emailController.text.trim();
+    final String password = _passwordController.text.trim();
+    final String confirmPassword = _confirmPasswordController.text.trim();
+
+    if (name.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in all fields')),
+      );
+      return;
+    }
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Passwords do not match')),
+      );
+      return;
+    }
+    if (!_termsAccepted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('You must accept the terms and conditions')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    bool signedUp = await _authService.signup(name, email, password);
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (signedUp) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Sign‑up successful')),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const ListingsPage()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Sign‑up failed')),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -41,16 +95,21 @@ class _SignupTabState extends State<SignupTab> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Name input field.
-                const CustomInputField(
-                  labelText: "Your Name",
-                  prefixIcon: Icons.person_outline,
+                Padding(
+                  padding: const EdgeInsets.only(top: 10.0),
+                  child: CustomInputField(
+                    labelText: "Your Name",
+                    prefixIcon: Icons.person_outline,
+                    controller: _nameController,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 // Email input field.
-                const CustomInputField(
+                CustomInputField(
                   labelText: "Enter your email",
                   prefixIcon: Icons.email_outlined,
                   keyboardType: TextInputType.emailAddress,
+                  controller: _emailController,
                 ),
                 const SizedBox(height: 16),
                 // Password input field.
@@ -58,6 +117,7 @@ class _SignupTabState extends State<SignupTab> {
                   labelText: "Enter your password",
                   prefixIcon: Icons.lock_outline,
                   obscureText: _obscurePassword,
+                  controller: _passwordController,
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscurePassword
@@ -77,6 +137,7 @@ class _SignupTabState extends State<SignupTab> {
                   labelText: "Confirm your password",
                   prefixIcon: Icons.lock_outline,
                   obscureText: _obscureConfirmPassword,
+                  controller: _confirmPasswordController,
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscureConfirmPassword
@@ -90,16 +151,11 @@ class _SignupTabState extends State<SignupTab> {
                     },
                   ),
                 ),
-                const SizedBox(height: 16),
                 // Criteria rows.
-                _buildCriteriaRow("At least 8 characters"),
-                const SizedBox(height: 4),
-                _buildCriteriaRow("At least 1 number"),
-                const SizedBox(height: 4),
-                _buildCriteriaRow("Both upper and lower case letters"),
-                const SizedBox(height: 16),
                 // Terms and conditions checkbox.
+                const SizedBox( height: 80.0),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Checkbox(
@@ -113,7 +169,7 @@ class _SignupTabState extends State<SignupTab> {
                     const Expanded(
                       child: Text(
                         "By agreeing to the terms and conditions you are entering into a legally binding contract with the service provider.",
-                        style: TextStyle(fontSize: 13, color: Colors.black54),
+                        style: TextStyle(fontSize: 10, color: Colors.black54),
                       ),
                     ),
                   ],
@@ -129,10 +185,17 @@ class _SignupTabState extends State<SignupTab> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    onPressed: () {
-                      // Add sign up logic.
-                    },
-                    child: const Text(
+                    onPressed: _isLoading ? null : _signup,
+                    child: _isLoading
+                        ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                        : const Text(
                       "Sign Up",
                       style: TextStyle(fontSize: 16, color: Colors.white),
                     ),

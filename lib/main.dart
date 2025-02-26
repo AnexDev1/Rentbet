@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:rentbet/views/onboarding/onboarding_page.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import 'package:rentbet/views/onboarding/onboarding_page.dart';
 void main() async{
+  await dotenv.load(fileName: ".env");
+
   WidgetsFlutterBinding.ensureInitialized();
 
+final String anonKey = dotenv.env['SUPABASE_ANONKEY']?? "";
   await Supabase.initialize(
-    url: 'https://dcvmagntezybofxgrcdq.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRjdm1hZ250ZXp5Ym9meGdyY2RxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA1NTcxNzEsImV4cCI6MjA1NjEzMzE3MX0.0RHSdYnm0xeWvh12WBhEb4sFNQuF5K2TpLFnhNT8Zas'
+    url: 'https://dcvmagntezybofxgrcdq.supabase.co' ,
+    anonKey:anonKey
   );
   runApp(const MyApp());
 }

@@ -10,14 +10,14 @@ class CustomInputField extends StatelessWidget {
   final TextEditingController? controller;
 
   const CustomInputField({
-    Key? key,
+    super.key,
     required this.labelText,
     this.prefixIcon,
     this.suffixIcon,
     this.obscureText = false,
     this.keyboardType = TextInputType.text,
     this.controller,
-  }) : super(key: key);
+  });
 
   OutlineInputBorder _buildInputBorder() {
     return OutlineInputBorder(
@@ -31,6 +31,7 @@ class CustomInputField extends StatelessWidget {
     return TextField(
       controller: controller,
       decoration: InputDecoration(
+        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
         suffixIcon: suffixIcon,
         labelText: labelText,

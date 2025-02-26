@@ -1,6 +1,8 @@
 // dart
 import 'package:flutter/material.dart';
 import 'package:rentbet/common/widgets/custom_inputfield.dart';
+import 'package:rentbet/services/auth_service.dart';
+import 'package:rentbet/views/listings/listings_page.dart';
 
 class LoginTab extends StatefulWidget {
   const LoginTab({Key? key}) : super(key: key);
@@ -10,8 +12,56 @@ class LoginTab extends StatefulWidget {
 }
 
 class _LoginTabState extends State<LoginTab> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  final AuthService _authService = AuthService();
+  bool _isLoading = false;
 
+  Future<void> _login() async {
+    final String email = _emailController.text.trim();
+    final String password = _passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter both email and password')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    bool loggedIn = await _authService.login(email, password);
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (loggedIn) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Login successful')),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const ListingsPage()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Login failed')),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+// dart
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -24,85 +74,25 @@ class _LoginTabState extends State<LoginTab> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    minimumSize: const Size.fromHeight(50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  onPressed: () {
-                    // Add Google login logic
-                  },
-                  icon: const Icon(Icons.g_mobiledata, size: 24, color: Colors.black),
-                  label: const Text(
-                    "Login with Google",
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    minimumSize: const Size.fromHeight(50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  onPressed: () {
-                    // Add Apple login logic
-                  },
-                  icon: const Icon(Icons.apple, size: 24, color: Colors.black),
-                  label: const Text(
-                    "Login with Apple",
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  children: [
-                    const Expanded(
-                      child: Divider(
-                        color: Colors.black26,
-                        thickness: 1,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Text(
-                        "or continue with email",
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: Colors.black54,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const Expanded(
-                      child: Divider(
-                        color: Colors.black26,
-                        thickness: 1,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20.0),
-                // Email input using CustomInputField.
-                const CustomInputField(
+                // Input Fields Section
+                const SizedBox(height: 40),
+                CustomInputField(
                   labelText: "Enter your email",
                   prefixIcon: Icons.email_outlined,
                   keyboardType: TextInputType.emailAddress,
+                  controller: _emailController,
                 ),
                 const SizedBox(height: 16),
-                // Password input using CustomInputField with toggle functionality.
                 CustomInputField(
                   labelText: "Enter your password",
                   prefixIcon: Icons.lock_outline,
                   obscureText: _obscurePassword,
+                  controller: _passwordController,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                      _obscurePassword
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
                     ),
                     onPressed: () {
                       setState(() {
@@ -135,14 +125,70 @@ class _LoginTabState extends State<LoginTab> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    onPressed: () {
-                      // Add login logic
-                    },
-                    child: const Text(
+                    onPressed: _isLoading ? null : _login,
+                    child: _isLoading
+                        ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor:
+                        AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                        : const Text(
                       "Login",
                       style: TextStyle(fontSize: 16, color: Colors.white),
                     ),
                   ),
+                ),
+                const SizedBox(height: 24),
+                // Social Login Icons Section moved to the bottom
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Google Login Icon
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withValues(alpha: 0.3),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: IconButton(
+                        icon: const Icon(Icons.g_mobiledata, size: 32, color: Colors.black),
+                        onPressed: () {
+                          // Add Google login logic
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    // Apple Login Icon
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withValues(alpha: 0.3),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: IconButton(
+                        icon: const Icon(Icons.apple, size: 32, color: Colors.black),
+                        onPressed: () {
+                          // Add Apple login logic
+                        },
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 RichText(
