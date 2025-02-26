@@ -89,7 +89,6 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 28,
-                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -120,7 +119,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 20,
+                      fontSize: 25,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -130,8 +129,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     _descriptions[_currentPage],
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
+                      color: Colors.white70,
+                      fontSize: 18,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -148,7 +147,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                         ),
                         onPressed: () {},
-                        child: const Text(r"Join"),
+                        child: const Text(r"Join", style: TextStyle(fontSize: 15),),
                       ),
                       OutlinedButton(
                         style: OutlinedButton.styleFrom(
@@ -158,7 +157,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           side: const BorderSide(color: Colors.white),
                         ),
                         onPressed: () {},
-                        child: const Text(r"Login"),
+                        child: const Text(r"Login", style: TextStyle(fontSize: 15)),
                       ),
                     ],
                   ),
