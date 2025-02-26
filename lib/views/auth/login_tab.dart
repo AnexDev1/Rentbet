@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:rentbet/common/widgets/custom_inputfield.dart';
 import 'package:rentbet/services/auth_service.dart';
+import 'package:rentbet/views/home/home_page.dart';
 import 'package:rentbet/views/listings/listings_page.dart';
 
 class LoginTab extends StatefulWidget {
@@ -45,7 +46,7 @@ class _LoginTabState extends State<LoginTab> {
       );
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const ListingsPage()),
+        MaterialPageRoute(builder: (context) => const HomePage()),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
