@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:rentbet/views/onboarding/onboarding_page.dart';
-
+import 'package:google_fonts/google_fonts.dart';
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -23,6 +23,9 @@ class MyApp extends StatelessWidget {
 
       title: 'Flutter Demo',
       theme: ThemeData(
+        textTheme: GoogleFonts.montserratTextTheme(
+          Theme.of(context).textTheme,
+        ),
         useMaterial3: true,
       ),
       home: OnboardingPage(),
