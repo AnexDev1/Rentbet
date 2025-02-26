@@ -27,9 +27,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
   ];
 
   final List<String> _images = [
-    r'assets/onboarding.jpg',
     r'assets/onboarding2.jpg',
     r'assets/onboarding3.jpg',
+    r'assets/onboarding.jpg',
     r'assets/onboarding4.jpg',
   ];
   int _currentPage = 0;
@@ -45,13 +45,14 @@ class _OnboardingPageState extends State<OnboardingPage> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(
         _titles.length,
-            (index) => Container(
+            (index) => AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
           margin: const EdgeInsets.symmetric(horizontal: 4),
-          width: 8,
+          width:_currentPage == index? 24 : 8,
           height: 8,
           decoration: BoxDecoration(
             color: _currentPage == index ? Colors.white : Colors.white38,
-            shape: BoxShape.circle,
+           borderRadius: BorderRadius.circular(4),
           ),
         ),
       ),
