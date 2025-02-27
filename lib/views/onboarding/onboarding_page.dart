@@ -1,4 +1,6 @@
+// dart
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../auth/auth_page.dart';
 
@@ -40,27 +42,35 @@ class _OnboardingPageState extends State<OnboardingPage> {
     });
   }
 
+  Future<void> _onAuthPressed(Widget authPage) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('seen_onboarding', true);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => authPage),
+    );
+  }
+
   Widget _buildPageIndicator() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(
-          _titles.length,
-              (index) => AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            margin: const EdgeInsets.symmetric(horizontal: 4),
-            width: _currentPage == index ? 24 : 8,
-            height: 8,
-            decoration: BoxDecoration(
-              color:
-              _currentPage == index ? Colors.white : Colors.white38,
-              borderRadius: BorderRadius.circular(4),
-            ),
-          )),
+        _titles.length,
+            (index) => AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          width: _currentPage == index ? 24 : 8,
+          height: 8,
+          decoration: BoxDecoration(
+            color: _currentPage == index ? Colors.white : Colors.white38,
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
+      ),
     );
   }
 
   void _onHorizontalDragEnd(DragEndDetails details) {
-    // Swipe detected; negative velocity swipes left, positive swipes right.
     if (details.primaryVelocity == null) return;
     if (details.primaryVelocity! < -200 && _currentPage < _images.length - 1) {
       _pageController.animateToPage(
@@ -85,7 +95,6 @@ class _OnboardingPageState extends State<OnboardingPage> {
         onHorizontalDragEnd: _onHorizontalDragEnd,
         child: Stack(
           children: [
-            // Background images using PageView.
             PageView.builder(
               controller: _pageController,
               onPageChanged: _onPageChanged,
@@ -99,7 +108,6 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 );
               },
             ),
-            // Persistent top logo image.
             Positioned(
               top: 40,
               left: 0,
@@ -111,20 +119,18 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 ),
               ),
             ),
-            // Persistent bottom overlay content with gradient for readability.
             Positioned(
               left: 0,
               right: 0,
               bottom: 0,
               child: Container(
-                padding:
-                const EdgeInsets.only(left: 16, right: 16, bottom: 32),
+                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 32),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter,
                     colors: [
-                      Colors.black.withValues(alpha: 0.9),
+                      Colors.black.withAlpha(230),
                       Colors.transparent,
                     ],
                   ),
@@ -132,7 +138,6 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Title for the current page.
                     Text(
                       _titles[_currentPage],
                       textAlign: TextAlign.center,
@@ -143,7 +148,6 @@ class _OnboardingPageState extends State<OnboardingPage> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    // Description for the current page.
                     Text(
                       _descriptions[_currentPage],
                       textAlign: TextAlign.center,
@@ -155,7 +159,6 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     const SizedBox(height: 16),
                     _buildPageIndicator(),
                     const SizedBox(height: 36),
-                    // Buttons row: Join (filled) and Login (outlined).
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -166,12 +169,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
                                 horizontal: 32, vertical: 12),
                           ),
                           onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => const AuthPage(showSignup: true,)));
+                            _onAuthPressed(const AuthPage(showSignup: true));
                           },
                           child: const Text(
                             r"Join",
-                            style:
-                            TextStyle(fontSize: 15, color: Colors.black),
+                            style: TextStyle(fontSize: 15, color: Colors.black),
                           ),
                         ),
                         OutlinedButton(
@@ -183,11 +185,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                             side: const BorderSide(color: Colors.white),
                           ),
                           onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => const AuthPage(),
-                              ),
-                            );
+                            _onAuthPressed(const AuthPage());
                           },
                           child: const Text(
                             r"Login",

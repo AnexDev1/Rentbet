@@ -44,7 +44,7 @@ class _DetailsPageState extends State<DetailsPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final bool isRent = (widget.property['type']?.toLowerCase() == 'rrent');
+    final bool isRent = (widget.property['type']?.toLowerCase() == 'rent');
 
     return Scaffold(
       body: Stack(

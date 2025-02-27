@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:rentbet/views/listings/widgets/search_bar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../models/listing_model.dart';
 import '../../services/listings_service.dart';
@@ -9,7 +10,7 @@ import '../listings/widgets/best_foryou_skeleton.dart';
 import '../listings/widgets/category_tabs.dart';
 import '../listings/widgets/list_card_skeleton.dart';
 import '../listings/widgets/listing_card.dart';
-import '../listings/widgets/search_bar.dart';
+import 'category_listing_page.dart';
 
 class ListingsPage extends StatefulWidget {
   const ListingsPage({Key? key}) : super(key: key);
@@ -217,18 +218,29 @@ class _ListingsPageState extends State<ListingsPage>
                     children: [
                       listingCardsSection,
                       const SizedBox(height: 16),
+                      // dart
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
                             'Best for you',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
-                          Text(
-                            'see more',
-                            style: TextStyle(
-                                fontSize: 14, color: Colors.grey[600]),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CategoryListingsPage(
+                                    category: _categories[_selectedCategoryIndex],
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              'See more',
+                              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                            ),
                           ),
                         ],
                       ),

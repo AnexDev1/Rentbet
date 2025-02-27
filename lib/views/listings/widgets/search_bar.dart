@@ -1,9 +1,10 @@
 // dart
 import 'package:flutter/material.dart';
 
+import '../search_result_page.dart';
+
 class SearchBarWidget extends StatelessWidget {
   final VoidCallback onFilter;
-
   const SearchBarWidget({Key? key, required this.onFilter}) : super(key: key);
 
   @override
@@ -12,6 +13,16 @@ class SearchBarWidget extends StatelessWidget {
       children: [
         Expanded(
           child: TextField(
+            onSubmitted: (value) {
+              if (value.trim().isNotEmpty) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SearchResultsPage(searchQuery: value),
+                  ),
+                );
+              }
+            },
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.symmetric(vertical: 14),
               hintText: 'Search',

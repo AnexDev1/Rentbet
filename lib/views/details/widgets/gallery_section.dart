@@ -37,7 +37,6 @@ class GallerySection extends StatelessWidget {
                 width: 80,
                 height: 80,
                 color: Colors.grey[300],
-                child: const Center(child: CircularProgressIndicator()),
               ),
               errorWidget: (context, url, error) => Container(
                 width: 80,
