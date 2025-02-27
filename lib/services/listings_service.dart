@@ -9,7 +9,7 @@ class ListingsService {
     final response = await supabase.from('listings').select();
     final data = response as List;
     return data
-        .map((e) => Listing.fromMap(e as Map<String, dynamic>))
+        .map((e) => Listing.fromJson(e as Map<String, dynamic>))
         .toList();
   }
   Future<List<String>> fetchGalleryImagesByCategory(String category) async {

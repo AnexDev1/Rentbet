@@ -1,5 +1,5 @@
-// dart
 class Listing {
+  final String id; // UUID from Supabase
   final String title;
   final String description;
   final double price;
@@ -9,6 +9,7 @@ class Listing {
   final String location;
 
   Listing({
+    required this.id,
     required this.title,
     required this.description,
     required this.price,
@@ -18,17 +19,19 @@ class Listing {
     required this.location,
   });
 
-  factory Listing.fromMap(Map<String, dynamic> map) {
+  // Factory method to create a Listing from JSON
+  factory Listing.fromJson(Map<String, dynamic> json) {
     return Listing(
-      title: map['title'] as String,
-      description: map['description'] as String,
-      price: (map['price'] is num)
-          ? (map['price'] as num).toDouble()
-          : double.tryParse(map['price'].toString()) ?? 0.0,
-      type: map['type'] as String,
-      category: map['category'] as String,
-      imageUrl: map['image_url'] as String,
-      location: map['location'] as String,
+      id: json['id'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String,
+      price: (json['price'] is int
+          ? (json['price'] as int).toDouble()
+          : json['price'] as double), // Handle int or double
+      type: json['type'] as String,
+      category: json['category'] as String,
+      imageUrl: json['image_url'] as String,
+      location: json['location'] as String,
     );
   }
 }

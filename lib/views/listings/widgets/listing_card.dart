@@ -18,7 +18,7 @@ class ListingCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: SizedBox(
-        width: 260,
+        width: 280,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

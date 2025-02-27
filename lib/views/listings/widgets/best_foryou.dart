@@ -15,20 +15,7 @@ class BestForYou extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 16),
-        // Row(
-        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        //   children: [
-        //     const Text(
-        //       'Best for you',
-        //       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        //     ),
-        //     Text(
-        //       'see more',
-        //       style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-        //     ),
-        //   ],
-        // ),
-        const SizedBox(height: 8),
+
         Column(
           children: listings.map((listing) {
             return GestureDetector(

@@ -1,5 +1,6 @@
 // dart
 import 'package:flutter/material.dart';
+import 'package:rentbet/views/details/widgets/gallery_skeleton.dart';
 import '/common/widgets/rounded_icon_button.dart';
 import '/views/details/widgets/user_profile_section.dart';
 import '/views/details/widgets/gallery_section.dart';
@@ -14,19 +15,35 @@ class DetailsPage extends StatefulWidget {
   _DetailsPageState createState() => _DetailsPageState();
 }
 
-class _DetailsPageState extends State<DetailsPage> {
-  Future<List<String>>? _galleryFuture;
+class _DetailsPageState extends State<DetailsPage>
+    with AutomaticKeepAliveClientMixin {
+  List<String>? _galleryImages;
+  bool _isGalleryLoading = true;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
     super.initState();
-    _galleryFuture = ListingsService().fetchGalleryImagesByCategory(
+    _loadGalleryImages();
+  }
+
+  Future<void> _loadGalleryImages() async {
+    final images = await ListingsService().fetchGalleryImagesByCategory(
       widget.property['category'] ?? '',
     );
+    if (mounted) {
+      setState(() {
+        _galleryImages = images;
+        _isGalleryLoading = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final bool isRent = (widget.property['type']?.toLowerCase() == 'rrent');
 
     return Scaffold(
@@ -127,26 +144,17 @@ class _DetailsPageState extends State<DetailsPage> {
                         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
-                      FutureBuilder<List<String>>(
-                        future: _galleryFuture,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return const Center(child: CircularProgressIndicator());
-                          } else if (snapshot.hasError) {
-                            return Center(child: Text('Error: ${snapshot.error}'));
-                          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                            return const Center(child: Text('No gallery images available.'));
-                          }
-                          final images = snapshot.data!;
-                          return GallerySection(
-                            images: images,
-                            onImageTap: (index, images) {
-                              _showFullScreenGallery(context, index, images);
-                            },
-                            onGalleryTap: (images) {
-                              _showGalleryBottomSheet(context, images);
-                            },
-                          );
+                      _isGalleryLoading
+                          ? const GallerySkeleton(itemCount: 3,)
+                          : _galleryImages == null || _galleryImages!.isEmpty
+                          ? const Center(child: Text('No gallery images available.'))
+                          : GallerySection(
+                        images: _galleryImages!,
+                        onImageTap: (index, images) {
+                          _showFullScreenGallery(context, index, images);
+                        },
+                        onGalleryTap: (images) {
+                          _showGalleryBottomSheet(context, images);
                         },
                       ),
                       const SizedBox(height: 24),
