@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:provider/provider.dart';
+import 'package:rentbet/providers/listings_provider.dart';
+import 'package:rentbet/providers/wishlist_provider.dart';
 import 'package:rentbet/views/auth/auth_page.dart';
 import 'package:rentbet/views/home/home_page.dart';
 import 'package:rentbet/views/onboarding/onboarding_page.dart';
@@ -21,7 +24,14 @@ Future<void> main() async {
   final prefs = await SharedPreferences.getInstance();
   final bool seenOnboarding = prefs.getBool('seen_onboarding') ?? false;
 
-  runApp(MyApp(seenOnboarding: seenOnboarding));
+  runApp(
+    MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (_) => ListingsProvider()),
+      ChangeNotifierProvider(create: (_) => WishlistProvider()),
+    ],
+    child: MyApp(seenOnboarding: seenOnboarding),
+  ),);
 }
 
 class MyApp extends StatelessWidget {

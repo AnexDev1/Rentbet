@@ -1,6 +1,10 @@
 // dart
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rentbet/views/details/widgets/gallery_skeleton.dart';
+import '../../models/listing_model.dart';
+import '../../providers/wishlist_provider.dart';
 import '/common/widgets/rounded_icon_button.dart';
 import '/views/details/widgets/user_profile_section.dart';
 import '/views/details/widgets/gallery_section.dart';
@@ -15,10 +19,10 @@ class DetailsPage extends StatefulWidget {
   _DetailsPageState createState() => _DetailsPageState();
 }
 
-class _DetailsPageState extends State<DetailsPage>
-    with AutomaticKeepAliveClientMixin {
+class _DetailsPageState extends State<DetailsPage> with AutomaticKeepAliveClientMixin {
   List<String>? _galleryImages;
   bool _isGalleryLoading = true;
+  bool _isBookmarked = false;
 
   @override
   bool get wantKeepAlive => true;
@@ -27,6 +31,7 @@ class _DetailsPageState extends State<DetailsPage>
   void initState() {
     super.initState();
     _loadGalleryImages();
+    _loadBookmarkState();
   }
 
   Future<void> _loadGalleryImages() async {
@@ -38,6 +43,28 @@ class _DetailsPageState extends State<DetailsPage>
         _galleryImages = images;
         _isGalleryLoading = false;
       });
+    }
+  }
+
+  Future<void> _loadBookmarkState() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _isBookmarked = prefs.getBool(widget.property['id']!) ?? false;
+    });
+  }
+
+  Future<void> _toggleBookmark() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _isBookmarked = !_isBookmarked;
+    });
+    prefs.setBool(widget.property['id']!, _isBookmarked);
+    if (_isBookmarked) {
+      Provider.of<WishlistProvider>(context, listen: false)
+          .addToWishlist(Listing.fromMap(widget.property));
+    } else {
+      Provider.of<WishlistProvider>(context, listen: false)
+          .removeFromWishlist(widget.property['id']!);
     }
   }
 
@@ -77,10 +104,8 @@ class _DetailsPageState extends State<DetailsPage>
                         top: MediaQuery.of(context).padding.top + 8,
                         right: 16,
                         child: RoundedIconButton(
-                          icon: Icons.bookmark_border,
-                          onPressed: () {
-                            // Bookmark action.
-                          },
+                          icon: _isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+                          onPressed: _toggleBookmark,
                         ),
                       ),
                       Positioned(
@@ -91,7 +116,7 @@ class _DetailsPageState extends State<DetailsPage>
                           children: [
                             Text(
                               widget.property['price'] != null && isRent
-                                  ? widget.property['price']! + '/month'
+                                  ? '${widget.property['price']!}/month'
                                   : widget.property['price'] ?? 'Price not available',
                               style: const TextStyle(
                                 fontSize: 24,

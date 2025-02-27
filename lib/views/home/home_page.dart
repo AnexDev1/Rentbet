@@ -1,6 +1,7 @@
 // dart
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:rentbet/views/wishlist/wishlist_page.dart';
 import '../listings/listings_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -38,7 +39,7 @@ class _HomePageState extends State<HomePage> {
         children: [
           ListingsPage(),
           const Center(child: Text('Inbox Page')),
-          const Center(child: Text('Wishlist Page')),
+          WishlistPage(),
           const Center(child: Text('Profile Page')),
         ],
       ),

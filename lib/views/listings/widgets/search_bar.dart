@@ -1,10 +1,9 @@
 // dart
 import 'package:flutter/material.dart';
-
 import '../search_result_page.dart';
 
 class SearchBarWidget extends StatelessWidget {
-  final VoidCallback onFilter;
+  final ValueChanged<String> onFilter;
   const SearchBarWidget({Key? key, required this.onFilter}) : super(key: key);
 
   @override
@@ -51,9 +50,25 @@ class SearchBarWidget extends StatelessWidget {
             border: Border.all(color: Colors.black54),
             borderRadius: BorderRadius.circular(30.0),
           ),
-          child: IconButton(
+          child: PopupMenuButton<String>(
             icon: const Icon(Icons.filter_list_rounded, size: 30),
-            onPressed: onFilter,
+            onSelected: (value) {
+              onFilter(value);
+            },
+            itemBuilder: (context) => const [
+              PopupMenuItem(
+                value: 'default',
+                child: Text('Default'),
+              ),
+              PopupMenuItem(
+                value: 'rent',
+                child: Text('Rent'),
+              ),
+              PopupMenuItem(
+                value: 'sell',
+                child: Text('Sell'),
+              ),
+            ],
           ),
         ),
       ],

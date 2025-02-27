@@ -1,16 +1,17 @@
-import 'dart:async';
+// dart
 import 'package:flutter/material.dart';
-import 'package:rentbet/views/listings/widgets/search_bar.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../models/listing_model.dart';
 import '../../services/listings_service.dart';
+import '../../providers/listings_provider.dart';
 import '../details/details_page.dart';
 import '../listings/widgets/best_foryou.dart';
 import '../listings/widgets/best_foryou_skeleton.dart';
 import '../listings/widgets/category_tabs.dart';
 import '../listings/widgets/list_card_skeleton.dart';
 import '../listings/widgets/listing_card.dart';
-import 'category_listing_page.dart';
+import '../listings/widgets/search_bar.dart';
 
 class ListingsPage extends StatefulWidget {
   const ListingsPage({Key? key}) : super(key: key);
@@ -22,17 +23,15 @@ class ListingsPage extends StatefulWidget {
 class _ListingsPageState extends State<ListingsPage>
     with AutomaticKeepAliveClientMixin {
   final List<String> _categories = [
-    'All',
-    'Realstate',
-    'Apartment',
-    'House',
-    'Motel',
-    'Condominium',
+    r'All',
+    r'Realstate',
+    r'Apartment',
+    r'House',
+    r'Motel',
+    r'Condominium',
   ];
   int _selectedCategoryIndex = 0;
-  List<Listing> _listings = [];
-  bool _isLoading = true;
-  late RealtimeChannel _subscription; // Updated to RealtimeChannel
+  late RealtimeChannel _subscription;
 
   @override
   bool get wantKeepAlive => true;
@@ -40,59 +39,52 @@ class _ListingsPageState extends State<ListingsPage>
   @override
   void initState() {
     super.initState();
-    _fetchData();
+    // Load initial listings with default filter.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<ListingsProvider>(context, listen: false)
+          .fetchListingsByType('default');
+    });
     _subscribeToListings();
   }
 
-  Future<void> _fetchData() async {
-    setState(() {
-      _isLoading = true;
-    });
-    final listings = await ListingsService().fetchListings();
-    setState(() {
-      _listings = listings;
-      _isLoading = false;
-    });
-  }
-
   void _subscribeToListings() {
-    // Subscribe to all changes on the "listings" table
     _subscription = Supabase.instance.client
-        .channel('public:listings') // Unique channel name
+        .channel('public:listings')
         .onPostgresChanges(
-      event: PostgresChangeEvent.insert, // INSERT events
+      event: PostgresChangeEvent.insert,
       schema: 'public',
       table: 'listings',
       callback: (payload) {
         final newListing = Listing.fromJson(payload.newRecord);
-        setState(() {
-          _listings.add(newListing);
-        });
+        // Refetch listings when new record comes in.
+        Provider.of<ListingsProvider>(context, listen: false)
+            .fetchListingsByType(
+            Provider.of<ListingsProvider>(context, listen: false)
+                .currentFilter);
       },
     )
         .onPostgresChanges(
-      event: PostgresChangeEvent.update, // UPDATE events
+      event: PostgresChangeEvent.update,
       schema: 'public',
       table: 'listings',
       callback: (payload) {
-        final updatedListing = Listing.fromJson(payload.newRecord);
-        setState(() {
-          final index = _listings.indexWhere((l) => l.id == updatedListing.id);
-          if (index != -1) {
-            _listings[index] = updatedListing;
-          }
-        });
+        // Update listings when record is updated.
+        Provider.of<ListingsProvider>(context, listen: false)
+            .fetchListingsByType(
+            Provider.of<ListingsProvider>(context, listen: false)
+                .currentFilter);
       },
     )
         .onPostgresChanges(
-      event: PostgresChangeEvent.delete, // DELETE events
+      event: PostgresChangeEvent.delete,
       schema: 'public',
       table: 'listings',
       callback: (payload) {
-        final deletedId = payload.oldRecord['id'];
-        setState(() {
-          _listings.removeWhere((l) => l.id == deletedId);
-        });
+        // Update listings when record is deleted.
+        Provider.of<ListingsProvider>(context, listen: false)
+            .fetchListingsByType(
+            Provider.of<ListingsProvider>(context, listen: false)
+                .currentFilter);
       },
     )
         .subscribe((status, [error]) {
@@ -106,14 +98,8 @@ class _ListingsPageState extends State<ListingsPage>
     });
   }
 
-  @override
-  void dispose() {
-    Supabase.instance.client.removeChannel(_subscription); // Updated method
-    super.dispose();
-  }
-
   List<Listing> _filterListings(List<Listing> listings) {
-    if (_categories[_selectedCategoryIndex] == 'All') {
+    if (_categories[_selectedCategoryIndex].toLowerCase() == r'all') {
       return listings;
     }
     return listings.where((listing) {
@@ -123,15 +109,22 @@ class _ListingsPageState extends State<ListingsPage>
   }
 
   @override
+  void dispose() {
+    Supabase.instance.client.removeChannel(_subscription);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
-    final filteredListings = _filterListings(_listings);
+    final provider = Provider.of<ListingsProvider>(context);
+    final filteredListings = _filterListings(provider.listings);
     final bestForYouList = filteredListings.take(3).toList();
 
     Widget listingCardsSection;
     Widget bestForYouContent;
 
-    if (_isLoading) {
+    if (provider.isLoading) {
       listingCardsSection = Container(
         margin: const EdgeInsets.only(top: 16),
         height: 250,
@@ -171,13 +164,13 @@ class _ListingsPageState extends State<ListingsPage>
                     MaterialPageRoute(
                       builder: (context) => DetailsPage(
                         property: {
-                          'imageUrl': listing.imageUrl,
-                          'price': '\$${listing.price}',
-                          'location': listing.location,
-                          'title': listing.title,
-                          'desc': listing.description,
-                          'category': listing.category,
-                          'type': listing.type,
+                          r'imageUrl': listing.imageUrl,
+                          r'price': '\$${listing.price}',
+                          r'location': listing.location,
+                          r'title': listing.title,
+                          r'desc': listing.description,
+                          r'category': listing.category,
+                          r'type': listing.type,
                         },
                       ),
                     ),
@@ -198,8 +191,9 @@ class _ListingsPageState extends State<ListingsPage>
           child: Column(
             children: [
               SearchBarWidget(
-                onFilter: () {
-                  // Add filter action here.
+                onFilter: (filter) {
+                  Provider.of<ListingsProvider>(context, listen: false)
+                      .fetchListingsByType(filter);
                 },
               ),
               CategoryTabs(
@@ -218,32 +212,6 @@ class _ListingsPageState extends State<ListingsPage>
                     children: [
                       listingCardsSection,
                       const SizedBox(height: 16),
-                      // dart
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Best for you',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => CategoryListingsPage(
-                                    category: _categories[_selectedCategoryIndex],
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Text(
-                              'See more',
-                              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                            ),
-                          ),
-                        ],
-                      ),
                       bestForYouContent,
                     ],
                   ),
