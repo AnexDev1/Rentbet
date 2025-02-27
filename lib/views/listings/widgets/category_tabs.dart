@@ -31,7 +31,7 @@ class CategoryTabs extends StatelessWidget {
               decoration: BoxDecoration(
                 color: isSelected ? Colors.black87 : Colors.transparent,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.black54),
+                border: Border.all(color: Colors.black26),
               ),
               child: Center(
                 child: Text(

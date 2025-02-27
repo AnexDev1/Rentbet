@@ -30,15 +30,15 @@ class SearchBarWidget extends StatelessWidget {
               filled: true,
               fillColor: Colors.transparent,
               border: OutlineInputBorder(
-                borderSide: const BorderSide(color: Colors.black54),
+                borderSide: const BorderSide(color: Colors.black26),
                 borderRadius: BorderRadius.circular(30.0),
               ),
               enabledBorder: OutlineInputBorder(
-                borderSide: const BorderSide(color: Colors.black54),
+                borderSide: const BorderSide(color: Colors.black26),
                 borderRadius: BorderRadius.circular(30.0),
               ),
               focusedBorder: OutlineInputBorder(
-                borderSide: const BorderSide(color: Colors.black54),
+                borderSide: const BorderSide(color: Colors.black26),
                 borderRadius: BorderRadius.circular(30.0),
               ),
             ),
@@ -47,7 +47,7 @@ class SearchBarWidget extends StatelessWidget {
         const SizedBox(width: 8),
         Container(
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.black54),
+            border: Border.all(color: Colors.black26),
             borderRadius: BorderRadius.circular(30.0),
           ),
           child: PopupMenuButton<String>(

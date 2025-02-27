@@ -217,7 +217,7 @@ class _DetailsPageState extends State<DetailsPage> with AutomaticKeepAliveClient
                               // Button action.
                             },
                             child: Text(
-                              isRent ? 'Rent Now' : 'Schedule a tour',
+                              isRent ? 'Rent Now' : 'Buy Now',
                               textAlign: TextAlign.center,
                               style: const TextStyle(color: Colors.white, fontSize: 16),
                             ),
