@@ -6,7 +6,6 @@ class WishlistProvider with ChangeNotifier {
   final List<Map<String, dynamic>> _wishlist = [];
 
   List<Map<String, dynamic>> get wishlist => _wishlist;
-
   void addToWishlist(Listing listing) {
     _wishlist.add(listing.toMap());
     notifyListeners();

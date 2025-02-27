@@ -17,7 +17,7 @@ class UserProfileSection extends StatelessWidget {
       children: [
         const CircleAvatar(
           radius: 24,
-          backgroundImage: AssetImage('assets/profile_placeholder.png'),
+          backgroundImage: AssetImage('assets/logo.png'),
         ),
         const SizedBox(width: 12),
         Column(

@@ -24,6 +24,7 @@ class _DetailsPageState extends State<DetailsPage> with AutomaticKeepAliveClient
   @override
   bool get wantKeepAlive => true;
 
+  // dart
   @override
   void initState() {
     super.initState();
@@ -31,12 +32,18 @@ class _DetailsPageState extends State<DetailsPage> with AutomaticKeepAliveClient
 
     final category = widget.property['category'] ?? '';
     _controller.loadGalleryImages(category);
-
     final id = widget.property['id'];
     if (id != null && id.isNotEmpty) {
-      _controller.loadBookmarkState(id);
+      _controller.loadBookmarkState(id).then((_) {
+        if (_controller.isBookmarked) {
+          // Add property to wishlist after widget build.
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Provider.of<WishlistProvider>(context, listen: false)
+                .addToWishlist(Listing.fromJson(widget.property));
+          });
+        }
+      });
     } else {
-      // Handle a missing id, for example, log a message or set a default behavior.
       print('Property id is missing.');
     }
   }
@@ -83,8 +90,7 @@ class _DetailsPageState extends State<DetailsPage> with AutomaticKeepAliveClient
                               child: RoundedIconButton(
                                 icon: controller.isBookmarked ? Icons.bookmark : Icons.bookmark_border,
                                 onPressed: () async {
-                                  await controller.toggleBookmarkState(widget.property['id']!);
-                                  await controller.updateWishlist(context, widget.property);
+                                  await controller.toggleAndUpdateWishlist(context, widget.property);
                                 },
                               ),
                             ),

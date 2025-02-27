@@ -29,10 +29,11 @@ class _WishlistPageState extends State<WishlistPage> {
         itemCount: wishlist.length,
         itemBuilder: (context, index) {
           final listingMap = wishlist[index];
+          print(listingMap);
           return ListingCard(
             listing: Listing.fromMap(listingMap),
             onTap: () {
-            
+
             },
           );
         },

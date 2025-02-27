@@ -156,11 +156,13 @@ class _ListingsPageState extends State<ListingsPage>
               return ListingCard(
                 listing: listing,
                 onTap: () {
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => DetailsPage(
                         property: {
+                          'id': listing.id,
                           'imageUrl': listing.imageUrl,
                           'price': '\$${listing.price}',
                           'location': listing.location,

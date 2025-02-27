@@ -1,13 +1,13 @@
-// dart
 class Listing {
   final String id;
   final String imageUrl;
-  final double price;
+  final double? price;
   final String location;
   final String title;
   final String description;
   final String category;
   final String type;
+  final bool isBookmarked;
 
   Listing({
     required this.id,
@@ -18,23 +18,34 @@ class Listing {
     required this.description,
     required this.category,
     required this.type,
+    this.isBookmarked = false,
   });
 
-  // Convert a Listing from a JSON
   factory Listing.fromJson(Map<String, dynamic> json) {
     return Listing(
-      id: json['id'] as String,
-      imageUrl: json['image_url'] as String,
-      price: (json['price'] is int ? (json['price'] as int).toDouble() : json['price'] as double),
-      location: json['location'] as String,
-      title: json['title'] as String,
-      description: json['description'] as String,
-      category: json['category'] as String,
-      type: json['type'] as String,
+      id: json['id'] as String? ?? '',
+      imageUrl: json['imageUrl'] as String? ??
+          json['image_url'] as String? ??
+          '',
+      price: json['price'] is int
+          ? (json['price'] as int).toDouble()
+          : json['price'] is double
+          ? json['price'] as double
+          : json['price'] is String
+          ? double.tryParse(
+          (json['price'] as String)
+              .replaceAll(RegExp(r'[^\d\.]'), '')) ??
+          0.0
+          : 0.0,
+      location: json['location'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      description: json['description'] as String? ?? '',
+      category: json['category'] as String? ?? '',
+      type: json['type'] as String? ?? '',
+      isBookmarked: json['isBookmarked'] as bool? ?? false,
     );
   }
 
-  // Convert a Listing from a Map
   factory Listing.fromMap(Map<String, dynamic> map) {
     return Listing(
       id: map['id'],
@@ -45,10 +56,10 @@ class Listing {
       description: map['description'],
       category: map['category'],
       type: map['type'],
+      isBookmarked: map['isBookmarked'] ?? false,
     );
   }
 
-  // Convert a Listing to a Map
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -59,6 +70,7 @@ class Listing {
       'description': description,
       'category': category,
       'type': type,
+      'isBookmarked': isBookmarked,
     };
   }
 }

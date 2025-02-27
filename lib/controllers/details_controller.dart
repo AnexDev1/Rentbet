@@ -24,29 +24,20 @@ class DetailsController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> toggleBookmarkState(String id) async {
+// dart
+  Future<void> toggleAndUpdateWishlist(BuildContext context, Map<String, dynamic> property) async {
+    // Toggle the bookmark state and update SharedPreferences.
     final prefs = await SharedPreferences.getInstance();
     isBookmarked = !isBookmarked;
-    prefs.setBool(id, isBookmarked);
+    prefs.setBool(property['id']!, isBookmarked);
     notifyListeners();
-  }
 
-  Future<void> updateWishlist(BuildContext context, Map<String, String> property) async {
+    // Update the wishlist based on the bookmark state.
+    final wishlistProvider = Provider.of<WishlistProvider>(context, listen: false);
     if (isBookmarked) {
-      Provider.of<WishlistProvider>(context, listen: false)
-          .addToWishlist(Listing.fromMap(property));
+      wishlistProvider.addToWishlist(Listing.fromJson(property));
     } else {
-      Provider.of<WishlistProvider>(context, listen: false)
-          .removeFromWishlist(property['id']!);
+      wishlistProvider.removeFromWishlist(property['id']!);
     }
-
-    // Show snackbar on next frame to ensure a valid ScaffoldMessenger context
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ScaffoldMessenger.of(context).removeCurrentSnackBar();
-      final message = isBookmarked ? 'Added to Bookmark' : 'Removed from Bookmark';
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
-    });
   }
 }
