@@ -1,22 +1,53 @@
-// dart
 import 'package:flutter/material.dart';
-
+import 'package:rentbet/views/listings/category_listing_page.dart';
 import '../../../models/listing_model.dart';
 import '../../details/details_page.dart';
+import 'best_foryou_skeleton.dart';
 
 class BestForYou extends StatelessWidget {
   final List<Listing> listings;
+  final String category;
+  final bool isLoading;
 
-  const BestForYou({Key? key, required this.listings}) : super(key: key);
+  const BestForYou({
+    super.key,
+    required this.listings,
+    required this.category,
+    this.isLoading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        const SizedBox(height: 16),
-
-        Column(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Best For You',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CategoryListingsPage(category: category),
+                  ),
+                );
+              },
+              child: const Text(
+                'See More',
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
+          ],
+        ),
+        isLoading
+            ? const BestForYouSkeleton()
+            : Column(
           children: listings.map((listing) {
             return GestureDetector(
               onTap: () {

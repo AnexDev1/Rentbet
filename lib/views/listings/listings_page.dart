@@ -1,4 +1,3 @@
-// dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -23,12 +22,12 @@ class ListingsPage extends StatefulWidget {
 class _ListingsPageState extends State<ListingsPage>
     with AutomaticKeepAliveClientMixin {
   final List<String> _categories = [
-    r'All',
-    r'Realstate',
-    r'Apartment',
-    r'House',
-    r'Motel',
-    r'Condominium',
+    'All',
+    'Realstate',
+    'Apartment',
+    'House',
+    'Motel',
+    'Condominium',
   ];
   int _selectedCategoryIndex = 0;
   late RealtimeChannel _subscription;
@@ -99,7 +98,7 @@ class _ListingsPageState extends State<ListingsPage>
   }
 
   List<Listing> _filterListings(List<Listing> listings) {
-    if (_categories[_selectedCategoryIndex].toLowerCase() == r'all') {
+    if (_categories[_selectedCategoryIndex].toLowerCase() == 'all') {
       return listings;
     }
     return listings.where((listing) {
@@ -122,7 +121,6 @@ class _ListingsPageState extends State<ListingsPage>
     final bestForYouList = filteredListings.take(3).toList();
 
     Widget listingCardsSection;
-    Widget bestForYouContent;
 
     if (provider.isLoading) {
       listingCardsSection = Container(
@@ -135,7 +133,6 @@ class _ListingsPageState extends State<ListingsPage>
           itemBuilder: (context, index) => const ListingCardSkeleton(),
         ),
       );
-      bestForYouContent = const BestForYouSkeleton();
     } else {
       listingCardsSection = AnimatedSwitcher(
         duration: const Duration(milliseconds: 200),
@@ -164,13 +161,13 @@ class _ListingsPageState extends State<ListingsPage>
                     MaterialPageRoute(
                       builder: (context) => DetailsPage(
                         property: {
-                          r'imageUrl': listing.imageUrl,
-                          r'price': '\$${listing.price}',
-                          r'location': listing.location,
-                          r'title': listing.title,
-                          r'desc': listing.description,
-                          r'category': listing.category,
-                          r'type': listing.type,
+                          'imageUrl': listing.imageUrl,
+                          'price': '\$${listing.price}',
+                          'location': listing.location,
+                          'title': listing.title,
+                          'desc': listing.description,
+                          'category': listing.category,
+                          'type': listing.type,
                         },
                       ),
                     ),
@@ -181,7 +178,6 @@ class _ListingsPageState extends State<ListingsPage>
           ),
         ),
       );
-      bestForYouContent = BestForYou(listings: bestForYouList);
     }
 
     return Scaffold(
@@ -212,7 +208,11 @@ class _ListingsPageState extends State<ListingsPage>
                     children: [
                       listingCardsSection,
                       const SizedBox(height: 16),
-                      bestForYouContent,
+                      BestForYou(
+                        listings: bestForYouList,
+                        category: _categories[_selectedCategoryIndex],
+                        isLoading: provider.isLoading,
+                      ),
                     ],
                   ),
                 ),
