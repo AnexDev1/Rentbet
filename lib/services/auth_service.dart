@@ -26,16 +26,15 @@ class AuthService {
 
 
 
-      // If sign up is successful, add the user info to the "users" table
-      // final insertResponse = await supabase
-      //     .from('users')
-      //     .insert({
-      //   'username': name,
-      //   'email': email,
-      // });
+      final insertResponse = await supabase
+          .from('users')
+          .insert({
+        'username': name,
+        'email': email,
+      });
 
       // Return true only if either a session or user exists and no error during insert
-      return (response.session != null || response.user != null) ;// insertResponse.error == null;
+      return (response.session != null || response.user != null) && insertResponse.error == null;
 
     } catch (e) {
       // Handle signup error

@@ -1,10 +1,14 @@
 // dart
 import 'package:flutter/material.dart';
+import '/common/widgets/rounded_icon_button.dart';
+import '/views/details/widgets/user_profile_section.dart';
+import '/views/details/widgets/gallery_section.dart';
+import '/views/details/widgets/map_view.dart';
 import '../../services/listings_service.dart';
 
 class DetailsPage extends StatefulWidget {
   final Map<String, String> property;
-  const DetailsPage({super.key, required this.property});
+  const DetailsPage({Key? key, required this.property}) : super(key: key);
 
   @override
   _DetailsPageState createState() => _DetailsPageState();
@@ -16,14 +20,14 @@ class _DetailsPageState extends State<DetailsPage> {
   @override
   void initState() {
     super.initState();
-    _galleryFuture = ListingsService()
-        .fetchGalleryImagesByCategory(widget.property['category'] ?? '');
+    _galleryFuture = ListingsService().fetchGalleryImagesByCategory(
+      widget.property['category'] ?? '',
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // Determine if the property is for rent
-    final bool isRent = (widget.property['type']?.toLowerCase() == 'rent');
+    final bool isRent = (widget.property['type']?.toLowerCase() == 'rrent');
 
     return Scaffold(
       body: Stack(
@@ -47,7 +51,7 @@ class _DetailsPageState extends State<DetailsPage> {
                       Positioned(
                         top: MediaQuery.of(context).padding.top + 8,
                         left: 16,
-                        child: _buildRoundedIconButton(
+                        child: RoundedIconButton(
                           icon: Icons.arrow_back_outlined,
                           onPressed: () => Navigator.pop(context),
                         ),
@@ -55,7 +59,7 @@ class _DetailsPageState extends State<DetailsPage> {
                       Positioned(
                         top: MediaQuery.of(context).padding.top + 8,
                         right: 16,
-                        child: _buildRoundedIconButton(
+                        child: RoundedIconButton(
                           icon: Icons.bookmark_border,
                           onPressed: () {
                             // Bookmark action.
@@ -95,8 +99,7 @@ class _DetailsPageState extends State<DetailsPage> {
               ),
               SliverToBoxAdapter(
                 child: Padding(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -110,41 +113,13 @@ class _DetailsPageState extends State<DetailsPage> {
                         style: const TextStyle(fontSize: 16, color: Colors.grey),
                       ),
                       const SizedBox(height: 24),
-                      Row(
-                        children: [
-                          const CircleAvatar(
-                            radius: 24,
-                            backgroundImage: AssetImage('assets/profile_placeholder.png'),
-                          ),
-                          const SizedBox(width: 12),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
-                              Text(
-                                'John Doe',
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                              Text(
-                                'Owner',
-                                style: TextStyle(fontSize: 14, color: Colors.grey),
-                              ),
-                            ],
-                          ),
-                          const Spacer(),
-                          _buildRectangularButton(
-                            icon: Icons.call,
-                            onPressed: () {
-                              // Call action.
-                            },
-                          ),
-                          const SizedBox(width: 8),
-                          _buildRectangularButton(
-                            icon: Icons.message,
-                            onPressed: () {
-                              // Message action.
-                            },
-                          ),
-                        ],
+                      UserProfileSection(
+                        onCall: () {
+                          // Call action.
+                        },
+                        onMessage: () {
+                          // Message action.
+                        },
                       ),
                       const SizedBox(height: 24),
                       const Text(
@@ -163,84 +138,19 @@ class _DetailsPageState extends State<DetailsPage> {
                             return const Center(child: Text('No gallery images available.'));
                           }
                           final images = snapshot.data!;
-                          int displayCount = images.length > 3 ? 3 : images.length;
-                          return Row(
-                            children: List.generate(displayCount, (index) {
-                              if (index == 2 && images.length > 3) {
-                                int remaining = images.length - 3;
-                                return GestureDetector(
-                                  onTap: () {
-                                    _showGalleryBottomSheet(context, images);
-                                  },
-                                  child: Stack(
-                                    children: [
-                                      Container(
-                                        margin: const EdgeInsets.only(right: 8),
-                                        width: 80,
-                                        height: 80,
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(8),
-                                          child: Image.network(
-                                            images[index],
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        margin: const EdgeInsets.only(right: 8),
-                                        width: 80,
-                                        height: 80,
-                                        decoration: BoxDecoration(
-                                          color: Colors.black45,
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            '+$remaining',
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                );
-                              } else {
-                                return GestureDetector(
-                                  onTap: () {
-                                    _showFullScreenGallery(context, index, images);
-                                  },
-                                  child: Container(
-                                    margin: const EdgeInsets.only(right: 8),
-                                    width: 80,
-                                    height: 80,
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: Image.network(
-                                        images[index],
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }
-                            }),
+                          return GallerySection(
+                            images: images,
+                            onImageTap: (index, images) {
+                              _showFullScreenGallery(context, index, images);
+                            },
+                            onGalleryTap: (images) {
+                              _showGalleryBottomSheet(context, images);
+                            },
                           );
                         },
                       ),
                       const SizedBox(height: 24),
-                      Container(
-                        height: 200,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: Colors.grey[300],
-                        ),
-                        child: const Center(child: Text('Map View: Location')),
-                      ),
+                      const MapView(),
                       const SizedBox(height: 100),
                     ],
                   ),
@@ -294,7 +204,7 @@ class _DetailsPageState extends State<DetailsPage> {
                         // Button action.
                       },
                       child: Text(
-                        isRent ? 'Rent Now' : 'Buy Now',
+                        isRent ? 'Rent Now' : 'Schedule a tour',
                         textAlign: TextAlign.center,
                         style: const TextStyle(color: Colors.white, fontSize: 16),
                       ),
@@ -370,39 +280,6 @@ class _DetailsPageState extends State<DetailsPage> {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildRoundedIconButton({
-    required IconData icon,
-    required VoidCallback onPressed,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.black26,
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.black26),
-      ),
-      child: IconButton(
-        icon: Icon(icon, color: Colors.white),
-        onPressed: onPressed,
-      ),
-    );
-  }
-
-  static Widget _buildRectangularButton({
-    required IconData icon,
-    required VoidCallback onPressed,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.black87,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: IconButton(
-        icon: Icon(icon, color: Colors.white),
-        onPressed: onPressed,
-      ),
     );
   }
 }
