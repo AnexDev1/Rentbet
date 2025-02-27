@@ -1,3 +1,4 @@
+// dart
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../listings/listings_page.dart';
@@ -17,7 +18,11 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _selectedIndex = index;
     });
-    _pageController.jumpToPage(index);
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
@@ -31,10 +36,10 @@ class _HomePageState extends State<HomePage> {
           });
         },
         children: [
-        ListingsPage(),
-        Center(child: Text('Inbox Page')),
-        Center(child: Text('Wishlist Page')),
-        Center(child: Text('Profile Page')),
+          ListingsPage(),
+          const Center(child: Text('Inbox Page')),
+          const Center(child: Text('Wishlist Page')),
+          const Center(child: Text('Profile Page')),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
