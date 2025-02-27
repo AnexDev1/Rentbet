@@ -27,8 +27,8 @@ Future<void> main() async {
   runApp(
     MultiProvider(
     providers: [
-      ChangeNotifierProvider(create: (_) => ListingsProvider()),
-      ChangeNotifierProvider(create: (_) => WishlistProvider()),
+      ChangeNotifierProvider<ListingsProvider>(create: (_) => ListingsProvider()),
+      ChangeNotifierProvider<WishlistProvider>(create: (_) => WishlistProvider()),
     ],
     child: MyApp(seenOnboarding: seenOnboarding),
   ),);
