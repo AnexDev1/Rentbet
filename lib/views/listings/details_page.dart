@@ -1,26 +1,34 @@
-// Dart
+// dart
 import 'package:flutter/material.dart';
+import '../../services/listings_service.dart';
 
-class DetailsPage extends StatelessWidget {
+class DetailsPage extends StatefulWidget {
   final Map<String, String> property;
+  const DetailsPage({super.key, required this.property});
 
-  const DetailsPage({Key? key, required this.property}) : super(key: key);
+  @override
+  _DetailsPageState createState() => _DetailsPageState();
+}
 
-  // Dummy gallery images
-  final List<String> galleryImages = const [
-    'assets/onboarding.jpg',
-    'assets/onboarding2.jpg',
-    'assets/onboarding3.jpg',
-    'assets/onboarding4.jpg'
-  ];
+class _DetailsPageState extends State<DetailsPage> {
+  Future<List<String>>? _galleryFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _galleryFuture = ListingsService()
+        .fetchGalleryImagesByCategory(widget.property['category'] ?? '');
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Determine if the property is for rent
+    final bool isRent = (widget.property['type']?.toLowerCase() == 'rent');
+
     return Scaffold(
       body: Stack(
         children: [
           CustomScrollView(
-            // Add extra padding at the bottom to avoid overlap
             slivers: [
               SliverAppBar(
                 expandedHeight: 300,
@@ -31,8 +39,8 @@ class DetailsPage extends StatelessWidget {
                   background: Stack(
                     fit: StackFit.expand,
                     children: [
-                      Image.asset(
-                        property['imageUrl']!,
+                      Image.network(
+                        widget.property['imageUrl']!,
                         fit: BoxFit.cover,
                       ),
                       Container(color: Colors.black26),
@@ -61,7 +69,9 @@ class DetailsPage extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              property['price'] ?? 'Property Title',
+                              widget.property['price'] != null && isRent
+                                  ? widget.property['price']! + '/month'
+                                  : widget.property['price'] ?? 'Price not available',
                               style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -70,7 +80,7 @@ class DetailsPage extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              property['location'] ?? 'Location',
+                              widget.property['location'] ?? 'Location',
                               style: const TextStyle(
                                 fontSize: 16,
                                 color: Colors.white70,
@@ -85,22 +95,21 @@ class DetailsPage extends StatelessWidget {
               ),
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Description section.
                       const Text(
                         'Description',
                         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        property['desc'] ?? 'No description available.',
+                        widget.property['desc'] ?? 'No description available.',
                         style: const TextStyle(fontSize: 16, color: Colors.grey),
                       ),
                       const SizedBox(height: 24),
-                      // Owner information.
                       Row(
                         children: [
                           const CircleAvatar(
@@ -138,17 +147,91 @@ class DetailsPage extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 24),
-                      // Gallery section.
                       const Text(
                         'Gallery',
                         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
-                      Row(
-                        children: _buildGalleryRow(context),
+                      FutureBuilder<List<String>>(
+                        future: _galleryFuture,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(child: Text('Error: ${snapshot.error}'));
+                          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                            return const Center(child: Text('No gallery images available.'));
+                          }
+                          final images = snapshot.data!;
+                          int displayCount = images.length > 3 ? 3 : images.length;
+                          return Row(
+                            children: List.generate(displayCount, (index) {
+                              if (index == 2 && images.length > 3) {
+                                int remaining = images.length - 3;
+                                return GestureDetector(
+                                  onTap: () {
+                                    _showGalleryBottomSheet(context, images);
+                                  },
+                                  child: Stack(
+                                    children: [
+                                      Container(
+                                        margin: const EdgeInsets.only(right: 8),
+                                        width: 80,
+                                        height: 80,
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(8),
+                                          child: Image.network(
+                                            images[index],
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        margin: const EdgeInsets.only(right: 8),
+                                        width: 80,
+                                        height: 80,
+                                        decoration: BoxDecoration(
+                                          color: Colors.black45,
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            '+$remaining',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                );
+                              } else {
+                                return GestureDetector(
+                                  onTap: () {
+                                    _showFullScreenGallery(context, index, images);
+                                  },
+                                  child: Container(
+                                    margin: const EdgeInsets.only(right: 8),
+                                    width: 80,
+                                    height: 80,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.network(
+                                        images[index],
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+                            }),
+                          );
+                        },
                       ),
                       const SizedBox(height: 24),
-                      // Map view container.
                       Container(
                         height: 200,
                         width: double.infinity,
@@ -156,11 +239,8 @@ class DetailsPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                           color: Colors.grey[300],
                         ),
-                        child: const Center(
-                          child: Text('Map View: Location'),
-                        ),
+                        child: const Center(child: Text('Map View: Location')),
                       ),
-                      // Extra space to allow scrolling beyond bottom bar
                       const SizedBox(height: 100),
                     ],
                   ),
@@ -168,7 +248,6 @@ class DetailsPage extends StatelessWidget {
               ),
             ],
           ),
-          // Static bottom section
           Positioned(
             left: 0,
             right: 0,
@@ -195,7 +274,9 @@ class DetailsPage extends StatelessWidget {
                         style: TextStyle(fontSize: 14, color: Colors.grey),
                       ),
                       Text(
-                        property['price'] ?? '',
+                        widget.property['price'] != null && isRent
+                            ? widget.property['price']! + '/month'
+                            : widget.property['price'] ?? '',
                         style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -210,12 +291,12 @@ class DetailsPage extends StatelessWidget {
                     ),
                     child: TextButton(
                       onPressed: () {
-                        // Rent now action.
+                        // Button action.
                       },
-                      child: const Text(
-                        'Rent Now',
+                      child: Text(
+                        isRent ? 'Rent Now' : 'Buy Now',
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                        style: const TextStyle(color: Colors.white, fontSize: 16),
                       ),
                     ),
                   ),
@@ -228,92 +309,7 @@ class DetailsPage extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildGalleryRow(BuildContext context) {
-    int total = galleryImages.length;
-    int displayCount = total > 3 ? 3 : total;
-    List<Widget> items = [];
-    for (int i = 0; i < displayCount; i++) {
-      bool isLast = i == displayCount - 1 && total > 3;
-      Widget imageWidget = GestureDetector(
-        onTap: () {
-          if (isLast) {
-            _showGallery(context);
-          } else {
-            _showFullScreenGallery(context, i);
-          }
-        },
-        child: Container(
-          margin: const EdgeInsets.only(right: 8),
-          width: 80,
-          height: 80,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Image.asset(
-                  galleryImages[i],
-                  fit: BoxFit.cover,
-                ),
-                if (isLast)
-                  Container(
-                    color: Colors.black45,
-                    child: Center(
-                      child: Text(
-                        '+${total - 3}',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ),
-      );
-      items.add(imageWidget);
-    }
-    return items;
-  }
-
-  void _showGallery(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (ctx) {
-        return Container(
-          padding: const EdgeInsets.all(16),
-          height: 300,
-          child: GridView.count(
-            crossAxisCount: 3,
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8,
-            children: galleryImages.asMap().entries.map((entry) {
-              int index = entry.key;
-              String img = entry.value;
-              return GestureDetector(
-                onTap: () {
-                  Navigator.pop(ctx);
-                  _showFullScreenGallery(context, index);
-                },
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.asset(
-                    img,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        );
-      },
-    );
-  }
-
-  void _showFullScreenGallery(BuildContext context, int initialIndex) {
+  void _showFullScreenGallery(BuildContext context, int initialIndex, List<String> images) {
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
@@ -322,17 +318,52 @@ class DetailsPage extends StatelessWidget {
       transitionDuration: const Duration(milliseconds: 300),
       pageBuilder: (_, __, ___) {
         return GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
+          onTap: () => Navigator.pop(context),
           child: PageView.builder(
             controller: PageController(initialPage: initialIndex),
-            itemCount: galleryImages.length,
+            itemCount: images.length,
             itemBuilder: (context, index) {
               return Center(
-                child: Image.asset(
-                  galleryImages[index],
+                child: Image.network(
+                  images[index],
                   fit: BoxFit.contain,
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  void _showGalleryBottomSheet(BuildContext context, List<String> images) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      builder: (context) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.4,
+          padding: const EdgeInsets.all(16),
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+            ),
+            itemCount: images.length,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                  _showFullScreenGallery(context, index, images);
+                },
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    images[index],
+                    fit: BoxFit.cover,
+                  ),
                 ),
               );
             },
