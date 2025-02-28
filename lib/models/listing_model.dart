@@ -1,5 +1,6 @@
 class Listing {
   final String id;
+  final String userId;
   final String title;
   final String location;
   final String price;  // Changed to String type
@@ -10,6 +11,8 @@ class Listing {
 
   Listing({
     this.id = '',
+    this.userId = '',
+
     this.title = '',
     this.location = '',
     this.price = '',  // Default to empty string
@@ -22,6 +25,7 @@ class Listing {
   factory Listing.fromMap(Map<String, dynamic> map) {
     return Listing(
       id: map['id']?.toString() ?? '',
+      userId: map['user_id']?.toString() ?? '',
       title: map['title']?.toString() ?? '',
       location: map['location']?.toString() ?? '',
       description: map['description']?.toString() ?? '',
@@ -54,6 +58,7 @@ class Listing {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'user_id': userId,
       'title': title,
       'location': location,
       'price': price,  // Price is already a string

@@ -28,6 +28,7 @@ class ProfileStatsCard extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
+              // Wishlist using provider data
               ProfileUtils.buildStatColumn(
                 context,
                 Icons.favorite_rounded,
@@ -36,19 +37,21 @@ class ProfileStatsCard extends StatelessWidget {
                 blackPrimary,
                 blackSecondary,
               ),
+              // Properties with dummy data
               ProfileUtils.buildStatColumn(
                 context,
-                Icons.bookmark_rounded,
-                '0',
-                'Bookmarks',
+                Icons.home_work_rounded,
+                '5', // dummy data
+                'Properties',
                 blackPrimary,
                 blackSecondary,
               ),
+              // Messages with dummy data
               ProfileUtils.buildStatColumn(
                 context,
-                Icons.history_rounded,
-                '12',
-                'Recent',
+                Icons.chat_bubble_outline,
+                '20', // dummy data
+                'Messages',
                 blackPrimary,
                 blackSecondary,
               ),
