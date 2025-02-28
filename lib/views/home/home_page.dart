@@ -45,23 +45,32 @@ class _HomePageState extends State<HomePage> {
           ProfileScreen()
         ],
       ),
+      // dart
       bottomNavigationBar: BottomNavigationBar(
         showUnselectedLabels: true,
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: FaIcon(FontAwesomeIcons.house),
+            icon: _selectedIndex == 0
+                ? FaIcon(FontAwesomeIcons.houseUser)
+                : FaIcon(FontAwesomeIcons.house),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: FaIcon(FontAwesomeIcons.inbox),
+            icon: _selectedIndex == 1
+                ? FaIcon(FontAwesomeIcons.solidEnvelope)
+                : FaIcon(FontAwesomeIcons.envelope),
             label: 'Inbox',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.favorite_outlined),
+            icon: _selectedIndex == 2
+                ? FaIcon(FontAwesomeIcons.solidHeart)
+                : FaIcon(FontAwesomeIcons.heart),
             label: 'Wishlist',
           ),
           BottomNavigationBarItem(
-            icon: FaIcon(FontAwesomeIcons.person),
+            icon: _selectedIndex == 3
+                ? FaIcon(FontAwesomeIcons.solidUser)
+                : FaIcon(FontAwesomeIcons.user),
             label: 'Profile',
           ),
         ],
