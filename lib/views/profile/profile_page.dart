@@ -1,6 +1,7 @@
 // lib/views/profile/profile_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rentbet/common/widgets/sign_out_button.dart';
 import '../../providers/user_provider.dart';
 import 'widgets/profile_app_bar.dart';
 import 'widgets/profile_stats_card.dart';
@@ -18,10 +19,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch user data when profile screen is opened
-    Future.microtask(() =>
-        Provider.of<UserProvider>(context, listen: false).fetchUserData()
-    );
+    Future.microtask(() {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      if (!userProvider.isDataLoaded) {
+        userProvider.fetchUserData();
+      }
+    });
   }
 
   @override
@@ -47,6 +50,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ],
                   ),
                 ),
+                // Add some space before the sign-out button
+                const SizedBox(height: 16),
+                // Add the sign-out button separated from other cards
+                const SignOutButton(),
+                const SizedBox(height: 32), // Extra space at the bottom
               ],
             ),
           ),

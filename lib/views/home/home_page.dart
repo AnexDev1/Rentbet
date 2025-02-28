@@ -1,6 +1,7 @@
 // dart
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:rentbet/views/inbox/inbox_page.dart';
 import 'package:rentbet/views/profile/profile_page.dart';
 import 'package:rentbet/views/wishlist/wishlist_page.dart';
 import '../listings/listings_page.dart';
@@ -39,7 +40,7 @@ class _HomePageState extends State<HomePage> {
         },
         children: [
           ListingsPage(),
-          const Center(child: Text('Inbox Page')),
+          InboxPage(),
           WishlistPage(),
           ProfileScreen()
         ],

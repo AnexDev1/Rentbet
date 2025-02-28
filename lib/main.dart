@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: seenOnboarding ? AuthPage() : OnboardingPage(),
+      home: seenOnboarding ? HomePage() : OnboardingPage(),
     );
   }
 }

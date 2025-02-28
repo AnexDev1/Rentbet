@@ -4,10 +4,11 @@ import 'package:provider/provider.dart';
 import 'package:rentbet/views/auth/auth_page.dart';
 import '../../../providers/wishlist_provider.dart';
 import '../../../services/auth_service.dart';
+import '../edit_profile_page.dart';
 import 'profile_utils.dart';
 
 class ProfileAccountCard extends StatelessWidget {
-  const ProfileAccountCard({Key? key}) : super(key: key);
+  const ProfileAccountCard({super.key});
 
   Future<void> _handleSignOut(BuildContext context) async {
     final authService = AuthService();
@@ -53,11 +54,17 @@ class ProfileAccountCard extends StatelessWidget {
           ),
           child: Column(
             children: [
+              // Update the onTap for Edit Profile in ProfileAccountCard
               ProfileUtils.buildListTile(
                 context,
                 Icons.person_outline,
                 'Edit Profile',
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const EditProfilePage())
+                  );
+                },
                 iconColor: blackPrimary,
                 textColor: blackPrimary,
               ),
@@ -95,17 +102,7 @@ class ProfileAccountCard extends StatelessWidget {
                 iconColor: blackPrimary,
                 textColor: blackPrimary,
               ),
-              Divider(height: 1, indent: 56, color: Colors.grey.shade200),
-              ProfileUtils.buildListTile(
-                context,
-                Icons.logout_outlined,
-                'Sign Out',
-                onTap: () {
-                  _handleSignOut(context);
-                },
-                iconColor: Colors.redAccent,
-                textColor: Colors.redAccent,
-              ),
+
             ],
           ),
         ),

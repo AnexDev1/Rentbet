@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '/common/widgets/rectangular_button.dart';
 
 class UserProfileSection extends StatelessWidget {
-  final VoidCallback onCall;
   final VoidCallback onMessage;
 
   const UserProfileSection({
     Key? key,
-    required this.onCall,
     required this.onMessage,
   }) : super(key: key);
 
@@ -36,7 +35,21 @@ class UserProfileSection extends StatelessWidget {
         const Spacer(),
         RectangularButton(
           icon: Icons.call,
-          onPressed: onCall,
+          onPressed: (){
+            () async {
+              // Replace with actual phone number from your data model
+              const phoneNumber = '+251917413622';
+              final Uri phoneUri = Uri(scheme: 'tel', path: phoneNumber);
+
+              try {
+                await launchUrl(phoneUri);
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Could not launch phone dialer')),
+                );
+              }
+            };
+          },
         ),
         const SizedBox(width: 8),
         RectangularButton(

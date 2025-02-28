@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rentbet/controllers/details_controller.dart';
 import 'package:rentbet/views/details/widgets/gallery_skeleton.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../models/listing_model.dart';
 import '../../providers/wishlist_provider.dart';
 import 'details_helpers.dart';
@@ -136,9 +137,7 @@ class _DetailsPageState extends State<DetailsPage> with AutomaticKeepAliveClient
                             ),
                             const SizedBox(height: 24),
                             UserProfileSection(
-                              onCall: () {
-                                // Call action.
-                              },
+
                               onMessage: () {
                                 // Message action.
                               },
