@@ -70,11 +70,14 @@ class BestForYou extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Row(
                   children: [
-                    Image.network(
-                      listing.imageUrl,
-                      height: 80,
-                      width: 100,
-                      fit: BoxFit.cover,
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(6),
+                      child: Image.network(
+                        listing.imageUrl,
+                        height: 80,
+                        width: 100,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(

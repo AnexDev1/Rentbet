@@ -1,11 +1,10 @@
-// dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rentbet/controllers/details_controller.dart';
 import 'package:rentbet/views/details/widgets/gallery_skeleton.dart';
 import '../../models/listing_model.dart';
 import '../../providers/wishlist_provider.dart';
-import 'details_helpers.dart'; // Import the new file
+import 'details_helpers.dart';
 import '/views/details/widgets/user_profile_section.dart';
 import '/views/details/widgets/gallery_section.dart';
 import '/views/details/widgets/map_view.dart';
@@ -24,25 +23,20 @@ class _DetailsPageState extends State<DetailsPage> with AutomaticKeepAliveClient
   @override
   bool get wantKeepAlive => true;
 
-  // dart
   @override
   void initState() {
     super.initState();
-    _controller = DetailsController();
+    // Get WishlistProvider and inject it into controller
+    final wishlistProvider = Provider.of<WishlistProvider>(context, listen: false);
+    _controller = DetailsController(wishlistProvider);
 
     final category = widget.property['category'] ?? '';
     _controller.loadGalleryImages(category);
+
+    // Load bookmark state from WishlistProvider
     final id = widget.property['id'];
     if (id != null && id.isNotEmpty) {
-      _controller.loadBookmarkState(id).then((_) {
-        if (_controller.isBookmarked) {
-          // Add property to wishlist after widget build.
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            Provider.of<WishlistProvider>(context, listen: false)
-                .addToWishlist(Listing.fromJson(widget.property));
-          });
-        }
-      });
+      _controller.loadBookmarkState(id);
     } else {
       print('Property id is missing.');
     }
@@ -53,8 +47,8 @@ class _DetailsPageState extends State<DetailsPage> with AutomaticKeepAliveClient
     super.build(context);
     final bool isRent = (widget.property['type']?.toLowerCase() == 'rent');
 
-    return ChangeNotifierProvider<DetailsController>(
-      create: (_) => _controller,
+    return ChangeNotifierProvider<DetailsController>.value(
+      value: _controller,
       child: Consumer<DetailsController>(
         builder: (context, controller, child) {
           return Scaffold(
@@ -90,7 +84,7 @@ class _DetailsPageState extends State<DetailsPage> with AutomaticKeepAliveClient
                               child: RoundedIconButton(
                                 icon: controller.isBookmarked ? Icons.bookmark : Icons.bookmark_border,
                                 onPressed: () async {
-                                  await controller.toggleAndUpdateWishlist(context, widget.property);
+                                  await controller.toggleBookmark(Listing.fromMap(widget.property));
                                 },
                               ),
                             ),

@@ -1,76 +1,66 @@
 class Listing {
   final String id;
-  final String imageUrl;
-  final double? price;
-  final String location;
   final String title;
+  final String location;
+  final String price;  // Changed to String type
+  final String imageUrl;
   final String description;
   final String category;
   final String type;
-  final bool isBookmarked;
 
   Listing({
-    required this.id,
-    required this.imageUrl,
-    required this.price,
-    required this.location,
-    required this.title,
-    required this.description,
-    required this.category,
-    required this.type,
-    this.isBookmarked = false,
+    this.id = '',
+    this.title = '',
+    this.location = '',
+    this.price = '',  // Default to empty string
+    this.imageUrl = '',
+    this.description = '',
+    this.category = '',
+    this.type = '',
   });
-
-  factory Listing.fromJson(Map<String, dynamic> json) {
-    return Listing(
-      id: json['id'] as String? ?? '',
-      imageUrl: json['imageUrl'] as String? ??
-          json['image_url'] as String? ??
-          '',
-      price: json['price'] is int
-          ? (json['price'] as int).toDouble()
-          : json['price'] is double
-          ? json['price'] as double
-          : json['price'] is String
-          ? double.tryParse(
-          (json['price'] as String)
-              .replaceAll(RegExp(r'[^\d\.]'), '')) ??
-          0.0
-          : 0.0,
-      location: json['location'] as String? ?? '',
-      title: json['title'] as String? ?? '',
-      description: json['description'] as String? ?? '',
-      category: json['category'] as String? ?? '',
-      type: json['type'] as String? ?? '',
-      isBookmarked: json['isBookmarked'] as bool? ?? false,
-    );
-  }
 
   factory Listing.fromMap(Map<String, dynamic> map) {
     return Listing(
-      id: map['id'],
-      imageUrl: map['imageUrl'],
-      price: map['price'],
-      location: map['location'],
-      title: map['title'],
-      description: map['description'],
-      category: map['category'],
-      type: map['type'],
-      isBookmarked: map['isBookmarked'] ?? false,
+      id: map['id']?.toString() ?? '',
+      title: map['title']?.toString() ?? '',
+      location: map['location']?.toString() ?? '',
+      description: map['description']?.toString() ?? '',
+      category: map['category']?.toString() ?? '',
+      type: map['type']?.toString() ?? '',
+      // Parse price directly to string with proper formatting
+      price: _parsePriceToString(map['price']),
+      imageUrl: map['imageUrl']?.toString() ?? map['image_url']?.toString() ?? '',
     );
+  }
+
+  // Parse price to formatted string
+  static String _parsePriceToString(dynamic value) {
+    if (value == null) return '';
+
+    // Already a string
+    if (value is String) return value;
+
+    // Handle numeric types with formatting
+    if (value is num) {
+      if (value == value.roundToDouble()) {
+        return value.round().toString();  // "100" instead of "100.0"
+      }
+      return value.toStringAsFixed(2);    // "100.50" with 2 decimal places
+    }
+
+    return '';
   }
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'imageUrl': imageUrl,
-      'price': price,
-      'location': location,
       'title': title,
+      'location': location,
+      'price': price,  // Price is already a string
+      'image_url': imageUrl,
       'description': description,
-      'category': category,
       'type': type,
-      'isBookmarked': isBookmarked,
+      'category': category,
     };
   }
 }

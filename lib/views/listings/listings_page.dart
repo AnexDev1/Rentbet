@@ -54,7 +54,7 @@ class _ListingsPageState extends State<ListingsPage>
       schema: 'public',
       table: 'listings',
       callback: (payload) {
-        final newListing = Listing.fromJson(payload.newRecord);
+        // final newListing = Listing.fromJson(payload.newRecord);
         // Refetch listings when new record comes in.
         Provider.of<ListingsProvider>(context, listen: false)
             .fetchListingsByType(

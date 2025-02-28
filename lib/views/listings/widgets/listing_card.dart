@@ -8,10 +8,10 @@ class ListingCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const ListingCard({
-    Key? key,
+    super.key,
     required this.listing,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,11 +22,17 @@ class ListingCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.network(
-              listing.imageUrl,
-              height: 180,
-              width: double.infinity,
-              fit: BoxFit.cover,
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(6),
+                topRight: Radius.circular(6),
+              ),
+              child: Image.network(
+                listing.imageUrl,
+                height: 180,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),

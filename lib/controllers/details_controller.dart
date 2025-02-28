@@ -1,43 +1,49 @@
-// dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../models/listing_model.dart';
 import '../providers/wishlist_provider.dart';
 import '../services/listings_service.dart';
 
 class DetailsController extends ChangeNotifier {
+  final WishlistProvider _wishlistProvider;
   List<String>? galleryImages;
   bool isGalleryLoading = true;
   bool isBookmarked = false;
 
+  DetailsController(this._wishlistProvider);
+
+  // Alternative constructor if you need to create without provider
+  factory DetailsController.create(BuildContext context) {
+    return DetailsController(
+        Provider.of<WishlistProvider>(context, listen: false)
+    );
+  }
+
   Future<void> loadGalleryImages(String category) async {
+    isGalleryLoading = true;
+    notifyListeners();
+
     final images = await ListingsService().fetchGalleryImagesByCategory(category);
     galleryImages = images;
     isGalleryLoading = false;
     notifyListeners();
   }
 
-  Future<void> loadBookmarkState(String id) async {
-    final prefs = await SharedPreferences.getInstance();
-    isBookmarked = prefs.getBool(id) ?? false;
+  // Update bookmark state from WishlistProvider
+  void loadBookmarkState(String propertyId) {
+    isBookmarked = _wishlistProvider.isBookmarked(propertyId);
     notifyListeners();
   }
 
-// dart
-  Future<void> toggleAndUpdateWishlist(BuildContext context, Map<String, dynamic> property) async {
-    // Toggle the bookmark state and update SharedPreferences.
-    final prefs = await SharedPreferences.getInstance();
-    isBookmarked = !isBookmarked;
-    prefs.setBool(property['id']!, isBookmarked);
-    notifyListeners();
-
-    // Update the wishlist based on the bookmark state.
-    final wishlistProvider = Provider.of<WishlistProvider>(context, listen: false);
-    if (isBookmarked) {
-      wishlistProvider.addToWishlist(Listing.fromJson(property));
+  // Toggle bookmark using only WishlistProvider
+  Future<void> toggleBookmark(Listing listing) async {
+    if (_wishlistProvider.isBookmarked(listing.id)) {
+      await _wishlistProvider.removeFromWishlist(listing.id);
+      isBookmarked = false;
     } else {
-      wishlistProvider.removeFromWishlist(property['id']!);
+      await _wishlistProvider.addToWishlist(listing);
+      isBookmarked = true;
     }
+    notifyListeners();
   }
 }
