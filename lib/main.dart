@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:rentbet/providers/listings_provider.dart';
+import 'package:rentbet/providers/user_provider.dart';
 import 'package:rentbet/providers/wishlist_provider.dart';
 import 'package:rentbet/views/auth/auth_page.dart';
 import 'package:rentbet/views/home/home_page.dart';
@@ -29,6 +30,7 @@ Future<void> main() async {
     providers: [
       ChangeNotifierProvider<ListingsProvider>(create: (_) => ListingsProvider()),
       ChangeNotifierProvider<WishlistProvider>(create: (_) => WishlistProvider()),
+      ChangeNotifierProvider<UserProvider>(create: (_) => UserProvider()),
     ],
     child: MyApp(seenOnboarding: seenOnboarding),
   ),);
@@ -48,7 +50,7 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: seenOnboarding ? HomePage() : OnboardingPage(),
+      home: seenOnboarding ? AuthPage() : OnboardingPage(),
     );
   }
 }

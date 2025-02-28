@@ -41,7 +41,7 @@ class _HomePageState extends State<HomePage> {
           ListingsPage(),
           const Center(child: Text('Inbox Page')),
           WishlistPage(),
-          ProfilePage()
+          ProfileScreen()
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(

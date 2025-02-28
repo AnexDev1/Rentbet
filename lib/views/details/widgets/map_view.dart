@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 class MapView extends StatefulWidget {
   final double? latitude;
@@ -18,43 +19,64 @@ class MapView extends StatefulWidget {
 }
 
 class _MapViewState extends State<MapView> {
-  GoogleMapController? _mapController;
-  late Set<Marker> _markers;
+  late MapController _mapController;
 
   @override
   void initState() {
     super.initState();
-    _markers = {
-      Marker(
-        markerId: const MarkerId('property'),
-        position: LatLng(widget.latitude!, widget.longitude!),
-        infoWindow: InfoWindow(title: widget.title),
-      ),
-    };
-  }
-
-  void _onMapCreated(GoogleMapController controller) {
-    _mapController = controller;
+    _mapController = MapController();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final LatLng propertyLocation = LatLng(widget.latitude!, widget.longitude!);
+
+    return SizedBox(
       height: 200,
       width: double.infinity,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        child: GoogleMap(
-          onMapCreated: _onMapCreated,
-          initialCameraPosition: CameraPosition(
-            target: LatLng(widget.latitude!, widget.longitude!),
-            zoom: 15,
+        child: FlutterMap(
+          mapController: _mapController,
+          options: MapOptions(
+            initialCenter: propertyLocation,
+            initialZoom: 15.0,
+            interactionOptions: InteractionOptions(
+              flags: InteractiveFlag.all,
+            ),
           ),
-          markers: _markers,
-          myLocationEnabled: false,
-          zoomControlsEnabled: false,
+          children: [
+            TileLayer(
+              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              userAgentPackageName: 'com.example.app',
+              maxZoom: 19,
+            ),
+            MarkerLayer(
+              markers: [
+                Marker(
+                  point: propertyLocation,
+                  width: 40,
+                  height: 40,
+                  child: Tooltip(
+                    message: widget.title!,
+                    child: const Icon(
+                      Icons.location_on,
+                      color: Colors.red,
+                      size: 40,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
   }
 }

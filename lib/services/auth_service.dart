@@ -22,24 +22,37 @@ class AuthService {
       final response = await supabase.auth.signUp(
         email: email,
         password: password,
+        data: {'username': name}, // Store name in auth metadata too (optional)
       );
 
+      // Check if the signup was successful
+      if (response.user != null) {
+        // Add the name and email to users table in supabase
+        // Include user_id to link with auth user
+        await supabase.from('users').insert({
+          'id': response.user!.id, // Link to auth user
+          'username': name,
+          'email': email
+        });
 
-
-      final insertResponse = await supabase
-          .from('users')
-          .insert({
-        'username': name,
-        'email': email,
-      });
-
-      // Return true only if either a session or user exists and no error during insert
-      return (response.session != null || response.user != null) && insertResponse.error == null;
-
+        return true;
+      } else {
+        print('Signup failed: No user returned');
+        return false;
+      }
     } catch (e) {
       // Handle signup error
       print('Signup error: $e');
       return false;
+    }
+  }
+
+  Future<void> signOut() async {
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      print('Error signing out: $error');
+      throw Exception('Failed to sign out');
     }
   }
 }
