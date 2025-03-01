@@ -51,8 +51,8 @@ class _HomePageState extends State<HomePage> {
         items: [
           BottomNavigationBarItem(
             icon: _selectedIndex == 0
-                ? FaIcon(FontAwesomeIcons.houseUser)
-                : FaIcon(FontAwesomeIcons.house),
+                ? Icon(Icons.home_rounded,size: 35,)
+                : Icon(Icons.home_outlined,size: 35, ),
             label: 'Home',
           ),
           BottomNavigationBarItem(

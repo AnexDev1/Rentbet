@@ -5,6 +5,7 @@ import 'package:rentbet/views/auth/auth_page.dart';
 import '../../../providers/wishlist_provider.dart';
 import '../../../services/auth_service.dart';
 import '../edit_profile_page.dart';
+import '../create_listings_page.dart';
 import 'profile_utils.dart';
 
 class ProfileAccountCard extends StatelessWidget {
@@ -88,8 +89,13 @@ class ProfileAccountCard extends StatelessWidget {
               ProfileUtils.buildListTile(
                 context,
                 Icons.bookmark_outline,
-                'Saved Listings',
-                onTap: () {},
+                'Create Listings',
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const CreateListingsPage())
+                  );
+                },
                 iconColor: blackPrimary,
                 textColor: blackPrimary,
               ),

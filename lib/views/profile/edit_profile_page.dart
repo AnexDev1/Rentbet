@@ -1,13 +1,13 @@
-// lib/views/profile/edit_profile_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../../providers/user_provider.dart';
-import '../../../services/auth_service.dart';
+
 
 class EditProfilePage extends StatefulWidget {
-  const EditProfilePage({Key? key}) : super(key: key);
+  const EditProfilePage({super.key});
 
   @override
   State<EditProfilePage> createState() => _EditProfilePageState();
@@ -30,7 +30,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       final user = userProvider.user;
       if (user != null) {
         // _nameController.text = user.displayName ?? '';
-        _emailController.text = user.email ?? '';
+        _emailController.text = user.email;
         // _phoneController.text = user.phoneNumber ?? '';
       }
     });
@@ -96,8 +96,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context);
-    final user = userProvider.user;
+    // final userProvider = Provider.of<UserProvider>(context);
+    // final user = userProvider.user;
     const Color blackPrimary = Color(0xDE000000);
 
     return Scaffold(

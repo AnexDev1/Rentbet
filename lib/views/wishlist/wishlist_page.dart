@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rentbet/views/home/home_page.dart';
-import '../../models/listing_model.dart';
+
 import '../../models/wishlist_model.dart';
 import '../../providers/wishlist_provider.dart';
-import '../details/details_page.dart';
-import '../listings/listings_page.dart';
-import '../listings/widgets/listing_card.dart';
+
 
 class WishlistPage extends StatefulWidget {
   const WishlistPage({super.key});

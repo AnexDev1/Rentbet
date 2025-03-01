@@ -1,3 +1,4 @@
+// dart
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
@@ -27,21 +28,28 @@ Future<void> main() async {
 
   runApp(
     MultiProvider(
-    providers: [
-      ChangeNotifierProvider<ListingsProvider>(create: (_) => ListingsProvider()),
-      ChangeNotifierProvider<WishlistProvider>(create: (_) => WishlistProvider()),
-      ChangeNotifierProvider<UserProvider>(create: (_) => UserProvider()),
-    ],
-    child: MyApp(seenOnboarding: seenOnboarding),
-  ),);
+      providers: [
+        ChangeNotifierProvider<ListingsProvider>(create: (_) => ListingsProvider()),
+        ChangeNotifierProvider<WishlistProvider>(create: (_) => WishlistProvider()),
+        ChangeNotifierProvider<UserProvider>(create: (_) => UserProvider()),
+      ],
+      child: MyApp(seenOnboarding: seenOnboarding),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key, required this.seenOnboarding}) : super(key: key);
+  const MyApp({super.key, required this.seenOnboarding});
   final bool seenOnboarding;
 
   @override
   Widget build(BuildContext context) {
+    // Check if there's a logged in user via Supabase
+    final user = Supabase.instance.client.auth.currentUser;
+    Widget startPage = seenOnboarding
+        ? (user != null ? HomePage() : AuthPage())
+        : OnboardingPage();
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -50,7 +58,7 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: seenOnboarding ? HomePage() : OnboardingPage(),
+      home: startPage,
     );
   }
 }
