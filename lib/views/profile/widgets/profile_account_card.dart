@@ -5,7 +5,7 @@ import 'package:rentbet/views/auth/auth_page.dart';
 import '../../../providers/wishlist_provider.dart';
 import '../../../services/auth_service.dart';
 import '../edit_profile_page.dart';
-import '../create_listings_page.dart';
+import '../createListing/create_listings_page.dart';
 import 'profile_utils.dart';
 
 class ProfileAccountCard extends StatelessWidget {
