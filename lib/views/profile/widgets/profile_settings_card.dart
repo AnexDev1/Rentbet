@@ -1,4 +1,3 @@
-// lib/views/profile/widgets/profile_settings_card.dart
 import 'package:flutter/material.dart';
 import 'profile_utils.dart';
 
@@ -7,19 +6,19 @@ class ProfileSettingsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color blackPrimary = Color(0xDE000000);
+    final theme = Theme.of(context);
+    final primaryText = theme.textTheme.bodyLarge?.color ?? Colors.black;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(vertical: 8.0),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: Text(
             'Settings',
-            style: TextStyle(
-              fontSize: 16,
+            style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
-              color: blackPrimary,
+              color: primaryText,
             ),
           ),
         ),
@@ -27,7 +26,7 @@ class ProfileSettingsCard extends StatelessWidget {
           elevation: 0.5,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: BorderSide(color: Colors.grey.shade200),
+            side: BorderSide(color: theme.dividerColor),
           ),
           child: Column(
             children: [
@@ -36,39 +35,39 @@ class ProfileSettingsCard extends StatelessWidget {
                 Icons.notifications_outlined,
                 'Notifications',
                 onTap: () {},
-                iconColor: blackPrimary,
-                textColor: blackPrimary,
+                iconColor: primaryText,
+                textColor: primaryText,
               ),
-              Divider(height: 1, indent: 56, color: Colors.grey.shade200),
+              Divider(height: 1, indent: 56, color: theme.dividerColor),
               ProfileUtils.buildListTile(
                 context,
                 Icons.language_outlined,
                 'Language',
                 trailing: Text(
                   'English',
-                  style: TextStyle(color: Colors.grey.shade600),
+                  style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor),
                 ),
                 onTap: () {},
-                iconColor: blackPrimary,
-                textColor: blackPrimary,
+                iconColor: primaryText,
+                textColor: primaryText,
               ),
-              Divider(height: 1, indent: 56, color: Colors.grey.shade200),
+              Divider(height: 1, indent: 56, color: theme.dividerColor),
               ProfileUtils.buildListTile(
                 context,
                 Icons.help_outline,
                 'Help & Support',
                 onTap: () {},
-                iconColor: blackPrimary,
-                textColor: blackPrimary,
+                iconColor: primaryText,
+                textColor: primaryText,
               ),
-              Divider(height: 1, indent: 56, color: Colors.grey.shade200),
+              Divider(height: 1, indent: 56, color: theme.dividerColor),
               ProfileUtils.buildListTile(
                 context,
                 Icons.info_outline,
                 'About',
                 onTap: () {},
-                iconColor: blackPrimary,
-                textColor: blackPrimary,
+                iconColor: primaryText,
+                textColor: primaryText,
               ),
             ],
           ),

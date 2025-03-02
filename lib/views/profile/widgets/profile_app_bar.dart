@@ -1,4 +1,4 @@
-// lib/views/profile/widgets/profile_app_bar.dart
+// dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/user_provider.dart';
@@ -8,19 +8,20 @@ class ProfileAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return SliverAppBar(
       expandedHeight: 200,
       pinned: true,
-      backgroundColor: Colors.white,
+      backgroundColor: theme.appBarTheme.backgroundColor ?? theme.scaffoldBackgroundColor,
       flexibleSpace: FlexibleSpaceBar(
         background: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Color(0xFF303030),
-                Color(0xFF212121),
+                theme.colorScheme.primary,
+                theme.colorScheme.primaryContainer,
               ],
             ),
           ),
@@ -37,11 +38,11 @@ class ProfileAppBar extends StatelessWidget {
                     Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 3),
+                        border: Border.all(color: theme.colorScheme.onPrimary, width: 3),
                       ),
                       child: isLoading
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const CircleAvatar(
+                          ? CircularProgressIndicator(color: theme.colorScheme.onPrimary)
+                          : CircleAvatar(
                         radius: 42,
                         backgroundImage: NetworkImage(
                           "https://example.com/profile.jpg",
@@ -50,21 +51,20 @@ class ProfileAppBar extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     if (isLoading)
-                      const CircularProgressIndicator(color: Colors.white)
+                      CircularProgressIndicator(color: theme.colorScheme.onPrimary)
                     else
                       Text(
                         user?.username ?? "User",
-                        style: const TextStyle(
-                          fontSize: 22,
+                        style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: theme.colorScheme.onPrimary,
                         ),
                       ),
                     if (!isLoading)
                       Text(
                         user?.email ?? "No email available",
-                        style: const TextStyle(
-                          color: Colors.white70,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onPrimary.withValues(alpha: 0.7),
                           fontSize: 14,
                         ),
                       ),

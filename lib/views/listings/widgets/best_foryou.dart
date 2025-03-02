@@ -1,3 +1,4 @@
+// dart
 import 'package:flutter/material.dart';
 import 'package:rentbet/views/listings/category_listing_page.dart';
 import '../../../models/listing_model.dart';
@@ -18,29 +19,30 @@ class BestForYou extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Best For You',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             TextButton(
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => CategoryListingsPage(category: category),
+                    builder: (_) => CategoryListingsPage(category: category),
                   ),
                 );
               },
-              child: const Text(
+              child: Text(
                 'See More',
-                style: TextStyle(color: Colors.grey),
+                style: theme.textTheme.bodyMedium?.copyWith(color: theme.disabledColor),
               ),
             ),
           ],
@@ -54,7 +56,7 @@ class BestForYou extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => DetailsPage(property: {
+                    builder: (_) => DetailsPage(property: {
                       'imageUrl': listing.imageUrl,
                       'price': '\$${listing.price}',
                       'location': listing.location,
@@ -88,14 +90,12 @@ class BestForYou extends StatelessWidget {
                             'Property at ${listing.location}',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
+                            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'Price: \$${listing.price}',
-                            style: const TextStyle(
-                                fontSize: 14, color: Colors.black54),
+                            style: theme.textTheme.bodyMedium?.copyWith(color: theme.textTheme.bodySmall?.color),
                           ),
                         ],
                       ),

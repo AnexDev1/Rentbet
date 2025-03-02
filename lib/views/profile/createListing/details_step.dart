@@ -1,3 +1,4 @@
+// dart
 import 'package:flutter/material.dart';
 
 class DetailsStep extends StatelessWidget {
@@ -9,7 +10,6 @@ class DetailsStep extends StatelessWidget {
   final String selectedType;
   final List<String> categories;
   final List<String> types;
-  final Color primaryColor;
 
   const DetailsStep({
     super.key,
@@ -21,11 +21,11 @@ class DetailsStep extends StatelessWidget {
     required this.selectedType,
     required this.categories,
     required this.types,
-    required this.primaryColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Form(
       key: formKey,
       child: Column(
@@ -33,79 +33,124 @@ class DetailsStep extends StatelessWidget {
         children: [
           Text(
             'Property Details',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: primaryColor),
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: theme.primaryColor,
+            ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           TextFormField(
             controller: titleController,
             decoration: InputDecoration(
               labelText: 'Property Title',
-              prefixIcon: Icon(Icons.title),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              prefixIcon: Icon(Icons.title, color: theme.iconTheme.color),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: theme.dividerColor),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: theme.dividerColor),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: theme.primaryColor),
+              ),
             ),
-            validator: (value) => value?.isEmpty ?? true ? 'Please enter title' : null,
+            validator: (value) =>
+            value?.isEmpty ?? true ? 'Please enter title' : null,
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           TextFormField(
             controller: priceController,
             decoration: InputDecoration(
               labelText: 'Price',
-              prefixIcon: Icon(Icons.attach_money),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              prefixIcon: Icon(Icons.attach_money, color: theme.iconTheme.color),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: theme.dividerColor),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: theme.dividerColor),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: theme.primaryColor),
+              ),
             ),
             keyboardType: TextInputType.number,
-            validator: (value) => value?.isEmpty ?? true ? 'Please enter price' : null,
+            validator: (value) =>
+            value?.isEmpty ?? true ? 'Please enter price' : null,
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           DropdownButtonFormField<String>(
             value: selectedCategory,
             decoration: InputDecoration(
               labelText: 'Category',
-              prefixIcon: Icon(Icons.category),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              prefixIcon: Icon(Icons.category, color: theme.iconTheme.color),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: theme.dividerColor),
+              ),
             ),
             items: categories.map((category) {
               return DropdownMenuItem<String>(
                 value: category,
-                child: Text(category),
+                child: Text(category, style: theme.textTheme.bodyLarge),
               );
             }).toList(),
             onChanged: (value) {
               if (value != null) {
-                // Update selected category
+                // Handle category change if needed
               }
             },
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           DropdownButtonFormField<String>(
             value: selectedType,
             decoration: InputDecoration(
               labelText: 'Property Type',
-              prefixIcon: Icon(Icons.home_work),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              prefixIcon: Icon(Icons.home_work, color: theme.iconTheme.color),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: theme.dividerColor),
+              ),
             ),
             items: types.map((type) {
               return DropdownMenuItem<String>(
                 value: type,
-                child: Text(type),
+                child: Text(type, style: theme.textTheme.bodyLarge),
               );
             }).toList(),
             onChanged: (value) {
               if (value != null) {
-                // Update selected type
+                // Handle type change if needed
               }
             },
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           TextFormField(
             controller: descriptionController,
             decoration: InputDecoration(
               labelText: 'Description',
               alignLabelWithHint: true,
-              prefixIcon: Icon(Icons.description),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              prefixIcon: Icon(Icons.description, color: theme.iconTheme.color),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: theme.dividerColor),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: theme.dividerColor),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: theme.primaryColor),
+              ),
             ),
-            validator: (value) => value?.isEmpty ?? true ? 'Please enter description' : null,
+            validator: (value) =>
+            value?.isEmpty ?? true ? 'Please enter description' : null,
             maxLines: 5,
           ),
         ],

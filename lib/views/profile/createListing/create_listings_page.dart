@@ -1,10 +1,10 @@
-// create_listings_page.dart
 import 'package:flutter/material.dart';
 import 'dart:io';
+import 'package:uuid/uuid.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../models/listing_model.dart';
 import '../../../services/listings_service.dart';
-
 import 'image_step.dart';
 import 'details_step.dart';
 import 'location_step.dart';
@@ -25,36 +25,34 @@ class _CreateListingsPageState extends State<CreateListingsPage> {
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
-  String _selectedCategory = 'Residential';
-  String _selectedType = 'Apartment';
+  String _selectedCategory = 'apartment';
+  String _selectedType = 'rent';
   int _currentStep = 0;
   bool _isLoading = false;
   List<File> _imageFiles = [];
   final ImagePicker _picker = ImagePicker();
 
-  // Color scheme
-  final Color _primaryColor = const Color(0xFF000000).withValues(alpha: 0.87);
-  final Color _secondaryColor = const Color(0xFF000000).withValues(alpha: 0.54);
-  final Color _accentColor = Colors.black87;
-  final Color _backgroundColor = Colors.white;
-
-  // Categories and types
-  final List<String> _categories = ['Residential', 'Commercial', 'Industrial', 'Land'];
-  final List<String> _types = ['Apartment', 'House', 'Villa', 'Office', 'Shop', 'Warehouse', 'Plot'];
+  final List<String> _categories = [
+    'apartment',
+    'motel',
+    'realstate',
+    'house',
+    'condominium'
+  ];
+  final List<String> _types = ['rent', 'sell'];
 
   Future<void> _pickImages() async {
     final List<XFile>? pickedFiles = await _picker.pickMultiImage();
-
     if (pickedFiles != null && pickedFiles.isNotEmpty) {
       setState(() {
-        _imageFiles.addAll(pickedFiles.map((file) => File(file.path)).toList());
+        _imageFiles.addAll(
+            pickedFiles.map((file) => File(file.path)).toList());
       });
     }
   }
 
   Future<void> _takePhoto() async {
     final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
-
     if (photo != null) {
       setState(() {
         _imageFiles.add(File(photo.path));
@@ -68,8 +66,37 @@ class _CreateListingsPageState extends State<CreateListingsPage> {
     });
   }
 
+  Future<String?> _uploadImage(File imageFile) async {
+    try {
+      final fileId = const Uuid().v4();
+      final fileExt = imageFile.path.split('.').last;
+      final filePath = 'property-images/$fileId.$fileExt';
+      await Supabase.instance.client.storage
+          .from('rentbetStorage')
+          .upload(filePath, imageFile);
+      final publicUrl = Supabase.instance.client.storage
+          .from('rentbetStorage')
+          .getPublicUrl(filePath);
+      return publicUrl;
+    } catch (e) {
+      debugPrint('Image upload error: $e');
+      return null;
+    }
+  }
+
   Future<void> _submitListing() async {
-    if (!_formKey1.currentState!.validate() || !_formKey2.currentState!.validate() || !_formKey3.currentState!.validate()) return;
+    if (!_formKey1.currentState!.validate() ||
+        !_formKey2.currentState!.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fill all required fields'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
     if (_imageFiles.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -86,8 +113,10 @@ class _CreateListingsPageState extends State<CreateListingsPage> {
     });
 
     try {
-      // Here you would upload images and get URLs
-      final imageUrl = "placeholder_for_actual_url"; // First image as primary
+      final imageUrl = await _uploadImage(_imageFiles.first);
+      if (imageUrl == null) {
+        throw Exception('Failed to upload image');
+      }
 
       final listing = Listing(
         title: _titleController.text,
@@ -99,16 +128,15 @@ class _CreateListingsPageState extends State<CreateListingsPage> {
         type: _selectedType,
       );
 
-      final newListingId = await ListingsService().createListing(listing);
-
+      await ListingsService().createListing(listing);
+      Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Listing published successfully!'),
           backgroundColor: Colors.green,
           behavior: SnackBarBehavior.floating,
         ),
       );
-      _clearForm();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -131,25 +159,32 @@ class _CreateListingsPageState extends State<CreateListingsPage> {
     _descriptionController.clear();
     setState(() {
       _imageFiles = [];
-      _selectedCategory = 'Residential';
-      _selectedType = 'Apartment';
+      _selectedCategory = 'apartment';
+      _selectedType = 'rent';
       _currentStep = 0;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: _backgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text('Create Listing', style: TextStyle(color: Colors.white)),
+        title: Text('Create Listing',
+            style: theme.appBarTheme.titleTextStyle ??
+                theme.textTheme.titleLarge?.copyWith(color: Colors.white)),
         centerTitle: true,
-        backgroundColor: _primaryColor,
+        backgroundColor:
+        theme.appBarTheme.backgroundColor ?? theme.primaryColor,
         elevation: 0,
       ),
       body: SafeArea(
         child: _isLoading
-            ? Center(child: CircularProgressIndicator(color: _accentColor))
+            ? Center(
+          child: CircularProgressIndicator(
+              color: theme.colorScheme.secondary),
+        )
             : Stepper(
           type: StepperType.horizontal,
           currentStep: _currentStep,
@@ -164,11 +199,17 @@ class _CreateListingsPageState extends State<CreateListingsPage> {
                       child: ElevatedButton(
                         onPressed: details.onStepContinue,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _accentColor,
-                          foregroundColor: Colors.white,
-                          padding: EdgeInsets.symmetric(vertical: 12),
+                          backgroundColor: theme.primaryColor,
+                          foregroundColor:
+                          theme.colorScheme.onPrimary,
+                          padding:
+                          const EdgeInsets.symmetric(vertical: 12),
                         ),
-                        child: Text('NEXT', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        child: Text('NEXT',
+                            style: theme.textTheme.bodyLarge
+                                ?.copyWith(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold)),
                       ),
                     ),
                   if (_currentStep == 2)
@@ -176,25 +217,33 @@ class _CreateListingsPageState extends State<CreateListingsPage> {
                       child: ElevatedButton(
                         onPressed: _submitListing,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _accentColor,
-                          foregroundColor: Colors.white,
-                          padding: EdgeInsets.symmetric(vertical: 12),
+                          backgroundColor: theme.primaryColor,
+                          foregroundColor:
+                          theme.colorScheme.onPrimary,
+                          padding:
+                          const EdgeInsets.symmetric(vertical: 12),
                         ),
-                        child: Text('PUBLISH', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        child: Text('PUBLISH',
+                            style: theme.textTheme.bodyLarge
+                                ?.copyWith(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold)),
                       ),
                     ),
-                  if (_currentStep > 0)
-                    SizedBox(width: 12),
+                  if (_currentStep > 0) const SizedBox(width: 12),
                   if (_currentStep > 0)
                     Expanded(
                       child: OutlinedButton(
                         onPressed: details.onStepCancel,
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: _secondaryColor,
-                          side: BorderSide(color: _secondaryColor),
-                          padding: EdgeInsets.symmetric(vertical: 12),
+                          foregroundColor: theme.hintColor,
+                          side: BorderSide(color: theme.hintColor),
+                          padding:
+                          const EdgeInsets.symmetric(vertical: 12),
                         ),
-                        child: Text('BACK', style: TextStyle(fontSize: 16)),
+                        child: Text('BACK',
+                            style: theme.textTheme.bodyLarge
+                                ?.copyWith(fontSize: 16)),
                       ),
                     ),
                 ],
@@ -213,25 +262,27 @@ class _CreateListingsPageState extends State<CreateListingsPage> {
           },
           steps: [
             Step(
-              stepStyle:_currentStep >= 0 ? StepStyle(color: Colors.black87) : null,
-
-              title: Text('Images'),
+              title: Text('Images', style: theme.textTheme.bodyLarge),
               isActive: _currentStep >= 0,
+              state: _currentStep == 0
+                  ? StepState.editing
+                  : StepState.indexed,
               content: ImageStep(
                 imageFiles: _imageFiles,
                 pickImages: _pickImages,
                 takePhoto: _takePhoto,
                 removeImage: _removeImage,
-                primaryColor: _primaryColor,
-                secondaryColor: _secondaryColor,
-                accentColor: _accentColor,
+                primaryColor: theme.primaryColor,
+                secondaryColor: theme.hintColor,
+                accentColor: theme.colorScheme.secondary,
               ),
             ),
             Step(
-              stepStyle:_currentStep >= 1 ? StepStyle(color: Colors.black87) : null,
-
-              title: Text('Details'),
+              title: Text('Details', style: theme.textTheme.bodyLarge),
               isActive: _currentStep >= 1,
+              state: _currentStep == 1
+                  ? StepState.editing
+                  : StepState.indexed,
               content: DetailsStep(
                 formKey: _formKey1,
                 titleController: _titleController,
@@ -241,19 +292,20 @@ class _CreateListingsPageState extends State<CreateListingsPage> {
                 selectedType: _selectedType,
                 categories: _categories,
                 types: _types,
-                primaryColor: _primaryColor,
+                // primaryColor: theme.primaryColor,
               ),
             ),
             Step(
-              stepStyle:_currentStep >= 2 ? StepStyle(color: Colors.black87) : null,
-
-              title: Text('Location'),
+              title: Text('Location', style: theme.textTheme.bodyLarge),
               isActive: _currentStep >= 2,
+              state: _currentStep == 2
+                  ? StepState.editing
+                  : StepState.indexed,
               content: LocationStep(
                 formKey: _formKey2,
                 locationController: _locationController,
-                primaryColor: _primaryColor,
-                secondaryColor: _secondaryColor,
+                primaryColor: theme.primaryColor,
+                secondaryColor: theme.hintColor,
               ),
             ),
           ],

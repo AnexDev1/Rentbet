@@ -1,8 +1,8 @@
+// dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../models/listing_model.dart';
-import '../../services/listings_service.dart';
 import '../../providers/listings_provider.dart';
 import '../details/details_page.dart';
 import '../listings/widgets/best_foryou.dart';
@@ -54,8 +54,6 @@ class _ListingsPageState extends State<ListingsPage>
       schema: 'public',
       table: 'listings',
       callback: (payload) {
-        // final newListing = Listing.fromJson(payload.newRecord);
-        // Refetch listings when new record comes in.
         Provider.of<ListingsProvider>(context, listen: false)
             .fetchListingsByType(
             Provider.of<ListingsProvider>(context, listen: false)
@@ -67,7 +65,6 @@ class _ListingsPageState extends State<ListingsPage>
       schema: 'public',
       table: 'listings',
       callback: (payload) {
-        // Update listings when record is updated.
         Provider.of<ListingsProvider>(context, listen: false)
             .fetchListingsByType(
             Provider.of<ListingsProvider>(context, listen: false)
@@ -79,7 +76,6 @@ class _ListingsPageState extends State<ListingsPage>
       schema: 'public',
       table: 'listings',
       callback: (payload) {
-        // Update listings when record is deleted.
         Provider.of<ListingsProvider>(context, listen: false)
             .fetchListingsByType(
             Provider.of<ListingsProvider>(context, listen: false)
@@ -116,6 +112,7 @@ class _ListingsPageState extends State<ListingsPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final theme = Theme.of(context);
     final provider = Provider.of<ListingsProvider>(context);
     final filteredListings = _filterListings(provider.listings);
     final bestForYouList = filteredListings.take(3).toList();
@@ -156,7 +153,6 @@ class _ListingsPageState extends State<ListingsPage>
               return ListingCard(
                 listing: listing,
                 onTap: () {
-
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -183,17 +179,20 @@ class _ListingsPageState extends State<ListingsPage>
     }
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
+              // SearchBarWidget will pick theme colors for text and background.
               SearchBarWidget(
                 onFilter: (filter) {
                   Provider.of<ListingsProvider>(context, listen: false)
                       .fetchListingsByType(filter);
                 },
               ),
+              // CategoryTabs styled with theme fonts and colors.
               CategoryTabs(
                 categories: _categories,
                 selectedIndex: _selectedCategoryIndex,

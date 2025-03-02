@@ -7,15 +7,30 @@ class ChatDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isLightTheme = theme.brightness == Brightness.light;
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text(userName),
+        title: Text(userName, style: theme.textTheme.titleLarge),
         elevation: 1,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: isLightTheme
+            ? theme.scaffoldBackgroundColor
+            : (theme.appBarTheme.backgroundColor ?? theme.scaffoldBackgroundColor),
+        iconTheme: IconThemeData(
+          color: isLightTheme
+              ? Colors.black
+              : (theme.appBarTheme.foregroundColor ?? theme.primaryColor),
+        ),
+        foregroundColor: isLightTheme
+            ? Colors.black
+            : (theme.appBarTheme.foregroundColor ?? theme.primaryColor),
       ),
-      body: const Center(
-        child: Text('Chat messages will appear here'),
+      body: Center(
+        child: Text(
+          'Chat messages will appear here',
+          style: theme.textTheme.bodyLarge,
+        ),
       ),
     );
   }

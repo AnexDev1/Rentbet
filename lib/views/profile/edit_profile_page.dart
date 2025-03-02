@@ -1,10 +1,9 @@
-
+// dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../../providers/user_provider.dart';
-
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -96,17 +95,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    // final userProvider = Provider.of<UserProvider>(context);
-    // final user = userProvider.user;
-    const Color blackPrimary = Color(0xDE000000);
-
+    final theme = Theme.of(context);
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Edit Profile', style: TextStyle(color: blackPrimary)),
+        title: Text(
+          'Edit Profile',
+          style: theme.appBarTheme.titleTextStyle ??
+              theme.textTheme.titleLarge?.copyWith(color: theme.textTheme.bodyLarge?.color),
+        ),
         elevation: 0,
-        backgroundColor: Colors.transparent,
+        backgroundColor: theme.appBarTheme.backgroundColor ?? theme.scaffoldBackgroundColor,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: blackPrimary),
+          icon: Icon(Icons.arrow_back, color: theme.iconTheme.color),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -127,26 +128,26 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   children: [
                     CircleAvatar(
                       radius: 60,
-                      backgroundColor: Colors.grey[200],
+                      backgroundColor: theme.colorScheme.surfaceVariant,
                       backgroundImage: _profileImage != null
                           ? FileImage(_profileImage!)
-
-                          : const AssetImage('assets/logo.png')),
-
+                          : const AssetImage('assets/logo.png') as ImageProvider,
+                    ),
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: theme.cardColor,
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withValues(alpha: 0.3),
+                            color: theme.shadowColor.withOpacity(0.3),
                             spreadRadius: 1,
                             blurRadius: 3,
                           ),
                         ],
                       ),
-                      child: const Icon(Icons.camera_alt, size: 20, color: blackPrimary),
+                      child: Icon(Icons.camera_alt,
+                          size: 20, color: theme.iconTheme.color),
                     ),
                   ],
                 ),
@@ -156,6 +157,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 controller: _nameController,
                 label: 'Full Name',
                 icon: Icons.person_outline,
+                theme: theme,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your name';
@@ -169,28 +171,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 label: 'Email Address',
                 icon: Icons.email_outlined,
                 keyboardType: TextInputType.emailAddress,
+                theme: theme,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your email';
-                  } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                  } else if (!RegExp(r'^[\w\-\.\+]+@([\w\-]+\.)+[\w\-]{2,4}$').hasMatch(value)) {
                     return 'Please enter a valid email address';
                   }
                   return null;
                 },
               ),
-              // const SizedBox(height: 16),
-              // _buildTextField(
-              //   controller: _phoneController,
-              //   label: 'Phone Number',
-              //   icon: Icons.phone_outlined,
-              //   keyboardType: TextInputType.phone,
-              //   validator: (value) {
-              //     if (value != null && value.isNotEmpty && !RegExp(r'^\+?[0-9]{10,15}$').hasMatch(value)) {
-              //       return 'Please enter a valid phone number';
-              //     }
-              //     return null;
-              //   },
-              // ),
               const SizedBox(height: 40),
               SizedBox(
                 width: double.infinity,
@@ -198,15 +188,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 child: ElevatedButton(
                   onPressed: _saveProfile,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black87,
+                    backgroundColor: theme.buttonTheme.colorScheme?.primary ?? theme.primaryColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Save Changes',
-                    style: TextStyle(
-                      color: Colors.white,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.onPrimary,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -224,6 +214,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     required TextEditingController controller,
     required String label,
     required IconData icon,
+    required ThemeData theme,
     TextInputType keyboardType = TextInputType.text,
     String? Function(String?)? validator,
     bool obscureText = false,
@@ -235,28 +226,28 @@ class _EditProfilePageState extends State<EditProfilePage> {
       validator: validator,
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icon, color: Colors.grey),
+        prefixIcon: Icon(icon, color: theme.iconTheme.color),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: const BorderSide(color: Colors.grey),
+          borderSide: BorderSide(color: theme.dividerColor),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderSide: BorderSide(color: theme.dividerColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: const BorderSide(color: Colors.black),
+          borderSide: BorderSide(color: theme.primaryColor),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: Colors.red.shade400),
+          borderSide: BorderSide(color: theme.colorScheme.error),
         ),
         filled: true,
-        fillColor: Colors.grey.shade50,
+        fillColor: theme.inputDecorationTheme.fillColor ?? theme.scaffoldBackgroundColor,
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       ),
-      style: const TextStyle(fontSize: 16),
+      style: theme.textTheme.bodyLarge?.copyWith(fontSize: 16),
     );
   }
 }

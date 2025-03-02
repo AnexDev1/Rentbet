@@ -1,4 +1,3 @@
-// lib/views/profile/profile_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rentbet/common/widgets/sign_out_button.dart';
@@ -29,8 +28,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: CustomScrollView(
         slivers: [
           const ProfileAppBar(),
@@ -50,11 +50,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ],
                   ),
                 ),
-                // Add some space before the sign-out button
                 const SizedBox(height: 16),
-                // Add the sign-out button separated from other cards
                 const SignOutButton(),
-                const SizedBox(height: 32), // Extra space at the bottom
+                const SizedBox(height: 32),
               ],
             ),
           ),

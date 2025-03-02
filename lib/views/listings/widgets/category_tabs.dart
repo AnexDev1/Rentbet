@@ -15,6 +15,12 @@ class CategoryTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final selectedBgColor = theme.primaryColor;
+    final selectedTextColor = theme.primaryTextTheme.labelLarge?.color ?? Colors.white;
+    final unselectedTextColor = theme.textTheme.bodyLarge?.color ?? Colors.black87;
+    final borderColor = theme.dividerColor;
+
     return Container(
       margin: const EdgeInsets.only(top: 16),
       height: 42,
@@ -29,15 +35,15 @@ class CategoryTabs extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: isSelected ? Colors.black87 : Colors.transparent,
+                color: isSelected ? selectedBgColor : Colors.transparent,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.black26),
+                border: Border.all(color: borderColor),
               ),
               child: Center(
                 child: Text(
                   categories[index],
                   style: TextStyle(
-                      color: isSelected ? Colors.white : Colors.black87),
+                      color: isSelected ? selectedTextColor : unselectedTextColor),
                 ),
               ),
             ),

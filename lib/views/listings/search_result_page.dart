@@ -1,3 +1,4 @@
+// dart
 import 'package:flutter/material.dart';
 import 'package:rentbet/views/home/home_page.dart';
 import 'package:rentbet/views/listings/listings_page.dart';
@@ -20,11 +21,6 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
   late TextEditingController _controller;
   String _sortBy = 'Default';
 
-  // App theme colors
-  final Color primaryColor = const Color(0xFF1C4980);
-  final Color accentColor = const Color(0xFFFF9500);
-  final Color backgroundColor = const Color(0xFFF2F2F7);
-
   @override
   void initState() {
     super.initState();
@@ -36,9 +32,7 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
     setState(() => _isLoading = true);
     final listings = await ListingsService().fetchListings();
     final filtered = listings.where((listing) {
-      return listing.title
-          .toLowerCase()
-          .contains(widget.searchQuery.toLowerCase());
+      return listing.title.toLowerCase().contains(widget.searchQuery.toLowerCase());
     }).toList();
     setState(() {
       _listings = filtered;
@@ -51,17 +45,14 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
       _sortBy = criteria;
       switch (criteria) {
         case 'Price: Low to High':
-          _listings.sort((a, b) =>
-              int.parse(a.price.replaceAll(RegExp(r'[^0-9]'), ''))
-                  .compareTo(int.parse(b.price.replaceAll(RegExp(r'[^0-9]'), ''))));
+          _listings.sort((a, b) => int.parse(a.price.replaceAll(RegExp(r'[^0-9]'), ''))
+              .compareTo(int.parse(b.price.replaceAll(RegExp(r'[^0-9]'), ''))));
           break;
         case 'Price: High to Low':
-          _listings.sort((a, b) =>
-              int.parse(b.price.replaceAll(RegExp(r'[^0-9]'), ''))
-                  .compareTo(int.parse(a.price.replaceAll(RegExp(r'[^0-9]'), ''))));
+          _listings.sort((a, b) => int.parse(b.price.replaceAll(RegExp(r'[^0-9]'), ''))
+              .compareTo(int.parse(a.price.replaceAll(RegExp(r'[^0-9]'), ''))));
           break;
         default:
-        // Default sorting - maintain original order
           break;
       }
     });
@@ -69,34 +60,33 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: theme.appBarTheme.backgroundColor ?? theme.scaffoldBackgroundColor,
         title: Container(
           height: 40,
           decoration: BoxDecoration(
-            color: Colors.grey[100],
+            color: theme.inputDecorationTheme.fillColor ?? Colors.grey[100],
             borderRadius: BorderRadius.circular(20),
           ),
           child: TextField(
             controller: _controller,
-            style: TextStyle(color: primaryColor),
+            style: theme.textTheme.bodyLarge?.copyWith(color: theme.primaryColor),
             decoration: InputDecoration(
               hintText: 'Search properties',
-              hintStyle: TextStyle(color: Colors.grey[500]),
-              prefixIcon: Icon(Icons.search, color: primaryColor),
+              hintStyle: theme.inputDecorationTheme.hintStyle,
+              prefixIcon: Icon(Icons.search, color: theme.primaryColor),
               suffixIcon: IconButton(
                 icon: const Icon(Icons.clear, size: 20),
-                color: Colors.grey[600],
+                color: theme.iconTheme.color,
                 onPressed: () {
                   _controller.clear();
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const HomePage(),
-                    ),
+                    MaterialPageRoute(builder: (context) => const HomePage()),
                   );
                 },
               ),
@@ -110,9 +100,7 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
               if (value.trim().isNotEmpty) {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => SearchResultsPage(searchQuery: value),
-                  ),
+                  MaterialPageRoute(builder: (context) => SearchResultsPage(searchQuery: value)),
                 );
               }
             },
@@ -120,65 +108,51 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
         ),
         actions: [
           PopupMenuButton<String>(
-            icon: Icon(Icons.sort, color: primaryColor),
+            icon: Icon(Icons.sort, color: theme.primaryColor),
             onSelected: _sortListings,
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              const PopupMenuItem<String>(
+              PopupMenuItem<String>(
                 value: 'Default',
-                child: Text('Default'),
+                child: Text('Default', style: theme.textTheme.bodyMedium),
               ),
-              const PopupMenuItem<String>(
+              PopupMenuItem<String>(
                 value: 'Price: Low to High',
-                child: Text('Price: Low to High'),
+                child: Text('Price: Low to High', style: theme.textTheme.bodyMedium),
               ),
-              const PopupMenuItem<String>(
+              PopupMenuItem<String>(
                 value: 'Price: High to Low',
-                child: Text('Price: High to Low'),
+                child: Text('Price: High to Low', style: theme.textTheme.bodyMedium),
               ),
             ],
           ),
         ],
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator(color: primaryColor))
+          ? Center(child: CircularProgressIndicator(color: theme.primaryColor))
           : _listings.isEmpty
           ? Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.search_off_rounded,
-              size: 70,
-              color: Colors.grey[400],
-            ),
+            Icon(Icons.search_off_rounded, size: 70, color: theme.disabledColor),
             const SizedBox(height: 16),
             Text(
               'No results found for "${widget.searchQuery}"',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.grey[700],
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: theme.textTheme.bodySmall?.color,
                 fontWeight: FontWeight.w500,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               'Try different keywords or categories',
-              style: TextStyle(
-                color: Colors.grey[600],
-              ),
+              style: theme.textTheme.titleSmall,
             ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
+              onPressed: () => Navigator.pop(context),
               style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                backgroundColor: theme.primaryColor,
               ),
               child: const Text('Back to Browse'),
             ),
@@ -194,16 +168,16 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
               children: [
                 Text(
                   '${_listings.length} ${_listings.length == 1 ? 'Result' : 'Results'} for "${widget.searchQuery}"',
-                  style: TextStyle(
+                  style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w500,
-                    color: Colors.grey[700],
+                    color: theme.textTheme.bodyLarge?.color,
                   ),
                 ),
                 Text(
                   'Sort: $_sortBy',
-                  style: TextStyle(
+                  style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w500,
-                    color: accentColor,
+                    color: theme.colorScheme.secondary,
                   ),
                 ),
               ],

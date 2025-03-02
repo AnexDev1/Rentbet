@@ -1,12 +1,12 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/listing_model.dart';
 
-final supabase = Supabase.instance.client;
+final SupabaseClient _supabaseClient = Supabase.instance.client;
 
 class ListingsService {
   // Read - fetch all listings
   Future<List<Listing>> fetchListings() async {
-    final response = await supabase.from('listings').select();
+    final response = await _supabaseClient.from('listings').select();
     final data = response as List;
     return data
         .map((e) => Listing.fromMap(e as Map<String, dynamic>))
@@ -14,7 +14,7 @@ class ListingsService {
   }
 // dart
   Future<List<String>> fetchGalleryImagesByCategory(String category) async {
-    final response = await supabase
+    final response = await _supabaseClient
         .from('listings')
         .select('image_url')
         .eq('category', category);
@@ -25,7 +25,7 @@ class ListingsService {
   }
   // Read - fetch a single listing by id
   Future<Listing?> fetchListingById(int id) async {
-    final response = await supabase
+    final response = await _supabaseClient
         .from('listings')
         .select()
         .eq('id', id)
@@ -34,29 +34,30 @@ class ListingsService {
       return null;
   }
 
-  // Create - insert a new listing
-  Future<int> createListing(Listing listing) async {
-    final user = supabase.auth.currentUser?.id;
-    if(user == null) {
-      throw Exception('User not authenticated');
-    }
+  Future<String> createListing(Listing listing) async {
+  try {
+  final response = await _supabaseClient.from('listings').insert({
+  'title': listing.title,
+  'location': listing.location,
+  'price': listing.price,
+  'image_url': listing.imageUrl,
+  'description': listing.description,
+  'category': listing.category,
+  'type': listing.type,
+  'created_at': DateTime.now().toIso8601String(),
+  'user_id': _supabaseClient.auth.currentUser?.id,
+  }).select('id').single();
 
-    final payload = listing.toMap();
-    payload['user_id'] = user;
-    final response = await supabase
-        .from('listings')
-        .insert(payload);
-    if (response.error != null) {
-      throw Exception('Insert error: \${response.error!.message}');
-    }
-    // Return the id of the newly created listing if available
-    final data = response.data as List;
-    return data.isNotEmpty ? data.first['id'] as int : 0;
+  return response['id'].toString();
+  } catch (e) {
+  throw Exception('Failed to create listing: $e');
+  }
+  }
   }
 
   // Update - update an existing listing by id
   Future<int> updateListing(int id, Listing updatedListing) async {
-    final response = await supabase
+    final response = await _supabaseClient
         .from('listings')
         .update(updatedListing.toMap())
         .eq('id', id);
@@ -69,7 +70,7 @@ class ListingsService {
 
   // Delete - remove a listing by id
   Future<int> deleteListing(int id) async {
-    final response = await supabase
+    final response = await _supabaseClient
         .from('listings')
         .delete()
         .eq('id', id);
@@ -79,4 +80,3 @@ class ListingsService {
     // Return the count of deleted rows
     return response.data.length;
   }
-}

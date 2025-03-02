@@ -5,7 +5,6 @@ import 'package:rentbet/views/home/home_page.dart';
 import '../../models/wishlist_model.dart';
 import '../../providers/wishlist_provider.dart';
 
-
 class WishlistPage extends StatefulWidget {
   const WishlistPage({super.key});
 
@@ -14,34 +13,34 @@ class WishlistPage extends StatefulWidget {
 }
 
 class _WishlistPageState extends State<WishlistPage> {
-  // Colors matching the profile page
-  static const Color blackPrimary = Color(0xDE000000); // 87% opacity black
-  static const Color blackSecondary = Color(0x8A000000); // 54% opacity black
-
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isLightTheme = theme.brightness == Brightness.light;
     final wishlistProvider = Provider.of<WishlistProvider>(context);
     final wishlist = wishlistProvider.wishlist;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.white,
+        backgroundColor: isLightTheme
+            ? theme.scaffoldBackgroundColor
+            : (theme.appBarTheme.backgroundColor ?? theme.scaffoldBackgroundColor),
         elevation: 0.5,
         centerTitle: false,
-        title: const Text(
+        title: Text(
           'My Wishlist',
-          style: TextStyle(
-            color: blackPrimary,
+          style: theme.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.bold,
             fontSize: 22,
+            color: isLightTheme ? Colors.black : (theme.appBarTheme.foregroundColor ?? theme.primaryColor),
           ),
         ),
         actions: [
           if (wishlist.isNotEmpty)
             IconButton(
-              icon: const Icon(Icons.sort, color: blackPrimary),
+              icon: Icon(Icons.sort, color: isLightTheme ? Colors.black : theme.iconTheme.color),
               onPressed: () {
                 // Sort functionality
               },
@@ -55,18 +54,18 @@ class _WishlistPageState extends State<WishlistPage> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                 children: [
-                  const Text(
+                  Text(
                     'Saved Properties',
-                    style: TextStyle(
-                      color: blackSecondary,
+                    style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w500,
+                      color: theme.hintColor,
                     ),
                   ),
                   const Spacer(),
                   Text(
                     '${wishlist.length} items',
-                    style: const TextStyle(
-                      color: blackSecondary,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      color: theme.hintColor,
                     ),
                   ),
                 ],
@@ -74,7 +73,7 @@ class _WishlistPageState extends State<WishlistPage> {
             ),
           Expanded(
             child: wishlist.isEmpty
-                ? _buildEmptyState()
+                ? _buildEmptyState(theme)
                 : Padding(
               padding: const EdgeInsets.all(12),
               child: GridView.builder(
@@ -86,10 +85,8 @@ class _WishlistPageState extends State<WishlistPage> {
                 ),
                 itemCount: wishlist.length,
                 itemBuilder: (context, index) {
-                  final listingMap = wishlist[index];
-                  final listing = listingMap;
-
-                  return _buildWishlistCard(context, listing);
+                  final listing = wishlist[index];
+                  return _buildWishlistCard(context, listing, theme);
                 },
               ),
             ),
@@ -99,12 +96,12 @@ class _WishlistPageState extends State<WishlistPage> {
     );
   }
 
-  Widget _buildWishlistCard(BuildContext context, WishlistItem item) {
+  Widget _buildWishlistCard(BuildContext context, WishlistItem item, ThemeData theme) {
     return Card(
       elevation: 0.5,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade200),
+        side: BorderSide(color: theme.dividerColor),
       ),
       child: InkWell(
         onTap: () {
@@ -127,8 +124,9 @@ class _WishlistPageState extends State<WishlistPage> {
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
-                          color: Colors.grey[200],
-                          child: const Icon(Icons.image_not_supported, size: 40),
+                          color: theme.dividerColor,
+                          child:
+                          Icon(Icons.image_not_supported, size: 40, color: theme.iconTheme.color),
                         );
                       },
                     ),
@@ -137,12 +135,12 @@ class _WishlistPageState extends State<WishlistPage> {
                     top: 8,
                     right: 8,
                     child: Container(
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white,
+                        color: theme.cardColor,
                       ),
                       child: IconButton(
-                        icon: const Icon(Icons.bookmark, ),
+                        icon: Icon(Icons.bookmark, color: theme.iconTheme.color),
                         iconSize: 20,
                         constraints: const BoxConstraints(
                           minHeight: 36,
@@ -153,10 +151,11 @@ class _WishlistPageState extends State<WishlistPage> {
                           Provider.of<WishlistProvider>(context, listen: false)
                               .removeFromWishlist(item.id);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Removed from wishlist'),
-                              duration: Duration(seconds: 1),
+                            SnackBar(
+                              content: const Text('Removed from wishlist'),
+                              duration: const Duration(seconds: 1),
                               behavior: SnackBarBehavior.floating,
+                              backgroundColor: theme.primaryColor,
                             ),
                           );
                         },
@@ -176,18 +175,18 @@ class _WishlistPageState extends State<WishlistPage> {
                   children: [
                     Text(
                       '\$${item.price}',
-                      style: const TextStyle(
+                      style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
-                        color: blackPrimary,
+                        color: theme.textTheme.bodyLarge?.color,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       item.title,
-                      style: const TextStyle(
+                      style: theme.textTheme.bodyMedium?.copyWith(
                         fontSize: 14,
-                        color: blackPrimary,
+                        color: theme.textTheme.bodyLarge?.color,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -195,15 +194,11 @@ class _WishlistPageState extends State<WishlistPage> {
                     const SizedBox(height: 2),
                     Text(
                       item.location,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: blackSecondary,
-                      ),
+                      style: theme.textTheme.bodySmall,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const Spacer(),
-                    // Feature chips removed as they reference properties not in WishlistItem
                   ],
                 ),
               ),
@@ -214,24 +209,7 @@ class _WishlistPageState extends State<WishlistPage> {
     );
   }
 
-  Widget _buildFeatureChip(IconData icon, String text) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 14, color: blackSecondary),
-        const SizedBox(width: 2),
-        Text(
-          text,
-          style: const TextStyle(
-            fontSize: 12,
-            color: blackSecondary,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(ThemeData theme) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -239,42 +217,37 @@ class _WishlistPageState extends State<WishlistPage> {
           Icon(
             Icons.favorite_border_rounded,
             size: 80,
-            color: Colors.grey[300],
+            color: theme.dividerColor,
           ),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'No saved properties',
-            style: TextStyle(
+            style: theme.textTheme.titleLarge?.copyWith(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: blackPrimary,
+              color: theme.textTheme.bodyLarge?.color,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'Properties you like will appear here',
-            style: TextStyle(
-              fontSize: 16,
-              color: blackSecondary,
-            ),
+            style: theme.textTheme.titleMedium,
           ),
           const SizedBox(height: 24),
           ElevatedButton(
             onPressed: () {
-              // Navigate to listings page
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(builder: (context) => const HomePage()),
               );
-
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF303030),
+              backgroundColor: theme.primaryColor,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text('Explore Properties', style: TextStyle(color: Colors.white),),
+            child: const Text('Explore Properties', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),

@@ -10,10 +10,9 @@ class ProfileStatsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final wishlistProvider = Provider.of<WishlistProvider>(context);
-
-    // Black with different opacities
-    const Color blackPrimary = Color(0xDE000000); // 87% opacity black
-    const Color blackSecondary = Color(0x8A000000); // 54% opacity black
+    final theme = Theme.of(context);
+    final Color primaryText = theme.textTheme.bodyLarge?.color ?? Colors.black;
+    final Color secondaryText = theme.textTheme.bodySmall?.color ?? Colors.grey;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
@@ -21,39 +20,36 @@ class ProfileStatsCard extends StatelessWidget {
         elevation: 0.5,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: Colors.grey.shade200),
+          side: BorderSide(color: theme.dividerColor),
         ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              // Wishlist using provider data
               ProfileUtils.buildStatColumn(
                 context,
                 Icons.favorite_rounded,
                 '${wishlistProvider.wishlist.length}',
                 'Wishlist',
-                blackPrimary,
-                blackSecondary,
+                primaryText,
+                secondaryText,
               ),
-              // Properties with dummy data
               ProfileUtils.buildStatColumn(
                 context,
                 Icons.home_work_rounded,
-                '5', // dummy data
+                '5',
                 'Properties',
-                blackPrimary,
-                blackSecondary,
+                primaryText,
+                secondaryText,
               ),
-              // Messages with dummy data
               ProfileUtils.buildStatColumn(
                 context,
                 Icons.chat_bubble_outline,
-                '20', // dummy data
+                '20',
                 'Messages',
-                blackPrimary,
-                blackSecondary,
+                primaryText,
+                secondaryText,
               ),
             ],
           ),

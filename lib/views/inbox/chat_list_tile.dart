@@ -9,7 +9,8 @@ class ChatListTile extends StatelessWidget {
   final bool isOnline;
   final VoidCallback onTap;
 
-  const ChatListTile({super.key,
+  const ChatListTile({
+    super.key,
     required this.name,
     required this.lastMessage,
     required this.time,
@@ -21,6 +22,7 @@ class ChatListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return InkWell(
       onTap: onTap,
       child: Padding(
@@ -41,9 +43,12 @@ class ChatListTile extends StatelessWidget {
                       height: 16,
                       width: 16,
                       decoration: BoxDecoration(
-                        color: Colors.green,
+                        color: theme.colorScheme.secondary,
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2),
+                        border: Border.all(
+                          color: theme.scaffoldBackgroundColor,
+                          width: 2,
+                        ),
                       ),
                     ),
                   ),
@@ -59,21 +64,13 @@ class ChatListTile extends StatelessWidget {
                     children: [
                       Text(
                         name,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: unreadCount > 0
-                              ? FontWeight.bold
-                              : FontWeight.w500,
-                        ),
+                        style: unreadCount > 0
+                            ? theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)
+                            : theme.textTheme.titleMedium,
                       ),
                       Text(
                         time,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: unreadCount > 0
-                              ? Colors.black
-                              : Colors.grey[600],
-                        ),
+                        style: theme.textTheme.bodySmall,
                       ),
                     ],
                   ),
@@ -85,29 +82,22 @@ class ChatListTile extends StatelessWidget {
                           lastMessage,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: unreadCount > 0
-                                ? Colors.black87
-                                : Colors.grey[600],
-                            fontWeight: unreadCount > 0
-                                ? FontWeight.w500
-                                : FontWeight.normal,
-                          ),
+                          style: unreadCount > 0
+                              ? theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500)
+                              : theme.textTheme.bodyMedium,
                         ),
                       ),
                       if (unreadCount > 0)
                         Container(
                           padding: const EdgeInsets.all(6),
-                          decoration: const BoxDecoration(
-                            color: Colors.black,
+                          decoration: BoxDecoration(
+                            color: theme.primaryColor,
                             shape: BoxShape.circle,
                           ),
                           child: Text(
                             unreadCount.toString(),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onPrimary,
                               fontWeight: FontWeight.bold,
                             ),
                           ),

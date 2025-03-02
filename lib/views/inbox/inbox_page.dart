@@ -1,3 +1,4 @@
+// dart
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -9,22 +10,39 @@ class InboxPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isLightTheme = theme.brightness == Brightness.light;
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Messages',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: isLightTheme ? Colors.black : theme.primaryColor,
+          ),
         ),
         elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: isLightTheme
+            ? theme.scaffoldBackgroundColor
+            : (theme.appBarTheme.backgroundColor ?? theme.scaffoldBackgroundColor),
+        foregroundColor: isLightTheme
+            ? Colors.black
+            : (theme.appBarTheme.foregroundColor ?? theme.primaryColor),
         actions: [
           IconButton(
-            icon: const FaIcon(FontAwesomeIcons.magnifyingGlass, size: 20),
+            icon: FaIcon(
+              FontAwesomeIcons.magnifyingGlass,
+              size: 20,
+              color: isLightTheme ? Colors.black : theme.iconTheme.color,
+            ),
             onPressed: () {},
           ),
           IconButton(
-            icon: const FaIcon(FontAwesomeIcons.ellipsisVertical, size: 20),
+            icon: FaIcon(
+              FontAwesomeIcons.ellipsisVertical,
+              size: 20,
+              color: isLightTheme ? Colors.black : theme.iconTheme.color,
+            ),
             onPressed: () {},
           ),
         ],
@@ -41,7 +59,6 @@ class InboxPage extends StatelessWidget {
             unreadCount: int.tryParse(chat['unreadCount'] ?? '0') ?? 0,
             isOnline: chat['isOnline'] == 'true',
             onTap: () {
-              // Navigate to individual chat page
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -54,18 +71,20 @@ class InboxPage extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
-        backgroundColor: Colors.black,
-        child: const Icon(Icons.add_comment_rounded, color: Colors.white),
+        backgroundColor: isLightTheme
+            ? Colors.white
+            : (theme.floatingActionButtonTheme.backgroundColor ?? theme.primaryColor),
+        child: Icon(
+          Icons.add_comment_rounded,
+          color: isLightTheme
+              ? Colors.black
+              : (theme.floatingActionButtonTheme.foregroundColor ?? Colors.white),
+        ),
       ),
     );
   }
 }
 
-
-
-
-
-// Dummy data for demonstration
 final List<Map<String, String>> _dummyChats = [
   {
     'name': 'Sarah Johnson',
@@ -91,5 +110,4 @@ final List<Map<String, String>> _dummyChats = [
     'unreadCount': '1',
     'isOnline': 'true',
   },
-  // Add more dummy chats as needed
 ];

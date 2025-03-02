@@ -1,3 +1,4 @@
+// dart
 import 'package:flutter/material.dart';
 import '../../models/listing_model.dart';
 import '../../services/listings_service.dart';
@@ -23,10 +24,6 @@ class _CategoryListingsPageState extends State<CategoryListingsPage> {
   int _currentPage = 1;
   final int _itemsPerPage = 10;
   int _totalPages = 1;
-
-  final Color primaryColor = const Color(0xFF1C4980);
-  final Color accentColor = const Color(0xFFFF9500);
-  final Color backgroundColor = const Color(0xFFF2F2F7);
 
   @override
   void initState() {
@@ -56,12 +53,9 @@ class _CategoryListingsPageState extends State<CategoryListingsPage> {
     final endIndex = startIndex + _itemsPerPage > _allListings.length
         ? _allListings.length
         : startIndex + _itemsPerPage;
-
-    if (startIndex >= _allListings.length) {
-      _paginatedListings = [];
-    } else {
-      _paginatedListings = _allListings.sublist(startIndex, endIndex);
-    }
+    _paginatedListings = startIndex >= _allListings.length
+        ? []
+        : _allListings.sublist(startIndex, endIndex);
   }
 
   void _changePage(int page) {
@@ -86,7 +80,6 @@ class _CategoryListingsPageState extends State<CategoryListingsPage> {
                   .compareTo(int.parse(a.price.replaceAll(RegExp(r'[^0-9]'), ''))));
           break;
         default:
-        // Default sorting
           break;
       }
       _updatePaginatedListings();
@@ -95,22 +88,20 @@ class _CategoryListingsPageState extends State<CategoryListingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: theme.appBarTheme.backgroundColor ?? theme.scaffoldBackgroundColor,
         title: Text(
           widget.category,
-          style: TextStyle(
-            color: primaryColor,
-            fontWeight: FontWeight.bold,
-          ),
+          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: theme.primaryColor),
         ),
-        iconTheme: IconThemeData(color: primaryColor),
+        iconTheme: IconThemeData(color: theme.primaryColor),
         actions: [
           PopupMenuButton<String>(
-            icon: Icon(Icons.sort, color: primaryColor),
+            icon: Icon(Icons.sort, color: theme.primaryColor),
             onSelected: _sortListings,
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
               const PopupMenuItem<String>(
@@ -130,21 +121,17 @@ class _CategoryListingsPageState extends State<CategoryListingsPage> {
         ],
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator(color: primaryColor))
+          ? Center(child: CircularProgressIndicator(color: theme.primaryColor))
           : _allListings.isEmpty
           ? Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.home_work_outlined, size: 70, color: Colors.grey),
+            Icon(Icons.home_work_outlined, size: 70, color: theme.disabledColor),
             const SizedBox(height: 16),
             Text(
               'No properties found',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey[700],
-              ),
+              style: theme.textTheme.titleMedium?.copyWith(color: theme.disabledColor),
             ),
           ],
         ),
@@ -158,17 +145,11 @@ class _CategoryListingsPageState extends State<CategoryListingsPage> {
               children: [
                 Text(
                   '${_allListings.length} ${_allListings.length == 1 ? 'Property' : 'Properties'}',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey[700],
-                  ),
+                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w500, color: theme.hintColor),
                 ),
                 Text(
                   'Sort: $_sortBy',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    color: accentColor,
-                  ),
+                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w500, color: theme.colorScheme.secondary),
                 ),
               ],
             ),
@@ -240,14 +221,13 @@ class _CategoryListingsPageState extends State<CategoryListingsPage> {
             ),
           ),
           // Pagination Controls
-          // Pagination Controls
           Container(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.scaffoldBackgroundColor,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
+                  color: theme.dividerColor.withOpacity(0.1),
                   spreadRadius: 1,
                   blurRadius: 5,
                   offset: const Offset(0, -3),
@@ -263,7 +243,7 @@ class _CategoryListingsPageState extends State<CategoryListingsPage> {
                     ElevatedButton(
                       onPressed: _currentPage > 1 ? () => _changePage(_currentPage - 1) : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _currentPage > 1 ? primaryColor : Colors.grey[300],
+                        backgroundColor: _currentPage > 1 ? theme.primaryColor : theme.disabledColor,
                         foregroundColor: Colors.white,
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.horizontal(left: Radius.circular(20)),
@@ -280,30 +260,25 @@ class _CategoryListingsPageState extends State<CategoryListingsPage> {
                         ],
                       ),
                     ),
-
                     // Page indicator
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                       decoration: BoxDecoration(
-                        color: Colors.grey[100],
+                        color: theme.cardColor,
                         border: Border.symmetric(
-                          vertical: BorderSide(color: Colors.grey[300]!, width: 1),
+                          vertical: BorderSide(color: theme.dividerColor, width: 1),
                         ),
                       ),
                       child: Text(
                         '$_currentPage of $_totalPages',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: primaryColor,
-                        ),
+                        style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: theme.primaryColor),
                       ),
                     ),
-
                     // Next page button
                     ElevatedButton(
                       onPressed: _currentPage < _totalPages ? () => _changePage(_currentPage + 1) : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _currentPage < _totalPages ? primaryColor : Colors.grey[300],
+                        backgroundColor: _currentPage < _totalPages ? theme.primaryColor : theme.disabledColor,
                         foregroundColor: Colors.white,
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.horizontal(right: Radius.circular(20)),
@@ -322,8 +297,6 @@ class _CategoryListingsPageState extends State<CategoryListingsPage> {
                     ),
                   ],
                 ),
-
-                // Show quick page jumps if there are many pages
                 if (_totalPages > 3)
                   Padding(
                     padding: const EdgeInsets.only(top: 10),
@@ -341,13 +314,13 @@ class _CategoryListingsPageState extends State<CategoryListingsPage> {
                                 height: 32,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: _currentPage == i ? primaryColor : Colors.grey[200],
+                                  color: _currentPage == i ? theme.primaryColor : theme.disabledColor.withOpacity(0.2),
                                 ),
                                 child: Center(
                                   child: Text(
                                     i.toString(),
-                                    style: TextStyle(
-                                      color: _currentPage == i ? Colors.white : Colors.black,
+                                    style: theme.textTheme.titleMedium?.copyWith(
+                                      color: _currentPage == i ? Colors.white : theme.textTheme.bodyLarge?.color,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),

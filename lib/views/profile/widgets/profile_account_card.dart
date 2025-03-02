@@ -1,4 +1,4 @@
-// lib/views/profile/widgets/profile_account_card.dart
+// dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rentbet/views/auth/auth_page.dart';
@@ -13,26 +13,21 @@ class ProfileAccountCard extends StatelessWidget {
 
   Future<void> _handleSignOut(BuildContext context) async {
     final authService = AuthService();
-
     try {
       await authService.signOut();
-
-      // Navigate to auth page and clear navigation stack
       Navigator.of(context).push(
-        MaterialPageRoute(builder: (context)=> AuthPage())
-      );
+          MaterialPageRoute(builder: (context) => AuthPage()));
     } catch (error) {
-      // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Sign out failed: ${error.toString()}')),
-      );
+          SnackBar(content: Text('Sign out failed: ${error.toString()}')));
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final wishlistProvider = Provider.of<WishlistProvider>(context);
-    const Color blackPrimary = Color(0xDE000000);
-
+    final theme = Theme.of(context);
+    final Color primaryText = theme.textTheme.bodyLarge?.color ?? Colors.black;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -40,10 +35,8 @@ class ProfileAccountCard extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: Text(
             'Account',
-            style: TextStyle(
-              fontSize: 16,
+            style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
-              color: blackPrimary,
             ),
           ),
         ),
@@ -51,11 +44,10 @@ class ProfileAccountCard extends StatelessWidget {
           elevation: 0.5,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: BorderSide(color: Colors.grey.shade200),
+            side: BorderSide(color: theme.dividerColor),
           ),
           child: Column(
             children: [
-              // Update the onTap for Edit Profile in ProfileAccountCard
               ProfileUtils.buildListTile(
                 context,
                 Icons.person_outline,
@@ -63,29 +55,34 @@ class ProfileAccountCard extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const EditProfilePage())
-                  );
+                      MaterialPageRoute(
+                          builder: (context) => const EditProfilePage()));
                 },
-                iconColor: blackPrimary,
-                textColor: blackPrimary,
+                iconColor: primaryText,
+                textColor: primaryText,
               ),
-              Divider(height: 1, indent: 56, color: Colors.grey.shade200),
+              Divider(
+                  height: 1,
+                  indent: 56,
+                  color: theme.dividerColor),
               ProfileUtils.buildListTile(
                 context,
                 Icons.favorite_outline,
                 'My Wishlist',
                 trailing: Text(
                   '${wishlistProvider.wishlist.length}',
-                  style: const TextStyle(
-                    color: blackPrimary,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: primaryText),
                 ),
                 onTap: () {},
-                iconColor: blackPrimary,
-                textColor: blackPrimary,
+                iconColor: primaryText,
+                textColor: primaryText,
               ),
-              Divider(height: 1, indent: 56, color: Colors.grey.shade200),
+              Divider(
+                  height: 1,
+                  indent: 56,
+                  color: theme.dividerColor),
               ProfileUtils.buildListTile(
                 context,
                 Icons.bookmark_outline,
@@ -93,22 +90,24 @@ class ProfileAccountCard extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const CreateListingsPage())
-                  );
+                      MaterialPageRoute(
+                          builder: (context) => const CreateListingsPage()));
                 },
-                iconColor: blackPrimary,
-                textColor: blackPrimary,
+                iconColor: primaryText,
+                textColor: primaryText,
               ),
-              Divider(height: 1, indent: 56, color: Colors.grey.shade200),
+              Divider(
+                  height: 1,
+                  indent: 56,
+                  color: theme.dividerColor),
               ProfileUtils.buildListTile(
                 context,
                 Icons.settings_outlined,
                 'Settings',
                 onTap: () {},
-                iconColor: blackPrimary,
-                textColor: blackPrimary,
+                iconColor: primaryText,
+                textColor: primaryText,
               ),
-
             ],
           ),
         ),
