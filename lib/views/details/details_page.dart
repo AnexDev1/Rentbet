@@ -199,13 +199,13 @@ class _DetailsPageState extends State<DetailsPage> with AutomaticKeepAliveClient
                               widget.property['price'] != null && isRent
                                   ? widget.property['price']! + '/month'
                                   : widget.property['price'] ?? '',
-                              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
                         const Spacer(),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 4),
                           width: 150,
                           decoration: BoxDecoration(
                             color: Colors.black87,

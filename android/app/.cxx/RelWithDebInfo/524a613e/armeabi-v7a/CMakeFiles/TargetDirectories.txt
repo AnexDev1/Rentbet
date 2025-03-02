@@ -1,0 +1,2 @@
+C:/Users/Anexo/StudioProjects/rentbet/android/app/.cxx/RelWithDebInfo/524a613e/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/Anexo/StudioProjects/rentbet/android/app/.cxx/RelWithDebInfo/524a613e/armeabi-v7a/CMakeFiles/rebuild_cache.dir

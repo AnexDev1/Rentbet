@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../providers/user_provider.dart';
 
 class ProfileAppBar extends StatelessWidget {
-  const ProfileAppBar({Key? key}) : super(key: key);
+  const ProfileAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -44,9 +44,11 @@ class ProfileAppBar extends StatelessWidget {
                           ? CircularProgressIndicator(color: theme.colorScheme.onPrimary)
                           : CircleAvatar(
                         radius: 42,
-                        backgroundImage: NetworkImage(
-                          "https://example.com/profile.jpg",
-                        ),
+                        backgroundImage: (user != null &&
+                            user.profileImage != null &&
+                            user.profileImage!.isNotEmpty)
+                            ? NetworkImage(user.profileImage!)
+                            : const AssetImage('assets/logo.png') as ImageProvider,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -64,7 +66,7 @@ class ProfileAppBar extends StatelessWidget {
                       Text(
                         user?.email ?? "No email available",
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onPrimary.withValues(alpha: 0.7),
+                          color: theme.colorScheme.onPrimary.withOpacity(0.7),
                           fontSize: 14,
                         ),
                       ),

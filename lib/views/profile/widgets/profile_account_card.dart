@@ -1,9 +1,5 @@
 // dart
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:rentbet/views/auth/auth_page.dart';
-import '../../../providers/wishlist_provider.dart';
-import '../../../services/auth_service.dart';
 import '../edit_profile_page.dart';
 import '../createListing/create_listings_page.dart';
 import 'profile_utils.dart';
@@ -11,23 +7,10 @@ import 'profile_utils.dart';
 class ProfileAccountCard extends StatelessWidget {
   const ProfileAccountCard({super.key});
 
-  Future<void> _handleSignOut(BuildContext context) async {
-    final authService = AuthService();
-    try {
-      await authService.signOut();
-      Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => AuthPage()));
-    } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Sign out failed: ${error.toString()}')));
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final wishlistProvider = Provider.of<WishlistProvider>(context);
     final theme = Theme.of(context);
-    final Color primaryText = theme.textTheme.bodyLarge?.color ?? Colors.black;
+    final primaryText = theme.textTheme.bodyLarge?.color ?? Colors.black;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -54,57 +37,60 @@ class ProfileAccountCard extends StatelessWidget {
                 'Edit Profile',
                 onTap: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const EditProfilePage()));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const EditProfilePage(),
+                    ),
+                  );
                 },
                 iconColor: primaryText,
                 textColor: primaryText,
               ),
-              Divider(
-                  height: 1,
-                  indent: 56,
-                  color: theme.dividerColor),
+              Divider(height: 1, indent: 56, color: theme.dividerColor),
               ProfileUtils.buildListTile(
                 context,
                 Icons.favorite_outline,
                 'My Wishlist',
                 trailing: Text(
-                  '${wishlistProvider.wishlist.length}',
+                  '0', // Replace with wishlist length
                   style: theme.textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: primaryText),
+                    fontWeight: FontWeight.bold,
+                    color: primaryText,
+                  ),
                 ),
                 onTap: () {},
                 iconColor: primaryText,
                 textColor: primaryText,
               ),
-              Divider(
-                  height: 1,
-                  indent: 56,
-                  color: theme.dividerColor),
+              Divider(height: 1, indent: 56, color: theme.dividerColor),
               ProfileUtils.buildListTile(
                 context,
                 Icons.bookmark_outline,
                 'Create Listings',
                 onTap: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const CreateListingsPage()));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const CreateListingsPage(),
+                    ),
+                  );
                 },
                 iconColor: primaryText,
                 textColor: primaryText,
               ),
-              Divider(
-                  height: 1,
-                  indent: 56,
-                  color: theme.dividerColor),
+              Divider(height: 1, indent: 56, color: theme.dividerColor),
               ProfileUtils.buildListTile(
                 context,
                 Icons.settings_outlined,
                 'Settings',
-                onTap: () {},
+                onTap: () {
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) => const ThemeSelector(),
+                  //   ),
+                  // );
+                },
                 iconColor: primaryText,
                 textColor: primaryText,
               ),

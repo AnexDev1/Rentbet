@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'profile_utils.dart';
 
 class ProfileSettingsCard extends StatelessWidget {
-  const ProfileSettingsCard({Key? key}) : super(key: key);
+  const ProfileSettingsCard({super.key});
 
   @override
   Widget build(BuildContext context) {

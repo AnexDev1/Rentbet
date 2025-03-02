@@ -89,37 +89,43 @@ class _CategoryListingsPageState extends State<CategoryListingsPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: theme.appBarTheme.backgroundColor ?? theme.scaffoldBackgroundColor,
-        title: Text(
-          widget.category,
-          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: theme.primaryColor),
-        ),
-        iconTheme: IconThemeData(color: theme.primaryColor),
-        actions: [
-          PopupMenuButton<String>(
-            icon: Icon(Icons.sort, color: theme.primaryColor),
-            onSelected: _sortListings,
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              const PopupMenuItem<String>(
-                value: 'Default',
-                child: Text('Default'),
-              ),
-              const PopupMenuItem<String>(
-                value: 'Price: Low to High',
-                child: Text('Price: Low to High'),
-              ),
-              const PopupMenuItem<String>(
-                value: 'Price: High to Low',
-                child: Text('Price: High to Low'),
-              ),
-            ],
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: theme.scaffoldBackgroundColor,
+          title: Text(
+            widget.category,
+            style:
+                theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : theme.primaryColor,
+                ),
           ),
-        ],
-      ),
+          centerTitle: true,
+          iconTheme: IconThemeData(color:  isDark ? Colors.white : theme.primaryColor),
+          actions: [
+            PopupMenuButton<String>(
+              icon: Icon(Icons.sort, color:  isDark ? Colors.white : theme.primaryColor),
+              onSelected: _sortListings,
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                const PopupMenuItem<String>(
+                  value: 'Default',
+                  child: Text('Default'),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'Price: Low to High',
+                  child: Text('Price: Low to High'),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'Price: High to Low',
+                  child: Text('Price: High to Low'),
+                ),
+              ],
+            ),
+          ],
+        ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator(color: theme.primaryColor))
           : _allListings.isEmpty

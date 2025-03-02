@@ -36,7 +36,7 @@ class UserProvider extends ChangeNotifier {
     required String name,
     required String email,
     String? phone,
-    File? profileImage,
+    String? profileImage,
   }) async {
     try {
       _isLoading = true;
@@ -64,7 +64,7 @@ class UserProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-  Future<String> _uploadProfileImage(File imageFile) async {
+  Future<String> _uploadProfileImage(String imageFile) async {
     // Implement file upload to storage
     // This would connect to your storage service (Firebase, Supabase, etc.)
     // Return the URL of the uploaded image

@@ -5,7 +5,7 @@ import '../../../providers/wishlist_provider.dart';
 import 'profile_utils.dart';
 
 class ProfileStatsCard extends StatelessWidget {
-  const ProfileStatsCard({Key? key}) : super(key: key);
+  const ProfileStatsCard({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -2,8 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:io';
 import '../../../providers/user_provider.dart';
+import '../../services/profile_image_service.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -29,7 +31,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       final user = userProvider.user;
       if (user != null) {
         // _nameController.text = user.displayName ?? '';
-        _emailController.text = user.email;
+        _emailController.text = user.email!;
         // _phoneController.text = user.phoneNumber ?? '';
       }
     });
@@ -46,21 +48,34 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
+
   Future<void> _saveProfile() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
-
       try {
         final userProvider = Provider.of<UserProvider>(context, listen: false);
+        String? profileImageUrl;
 
-        // Update user profile data
+        // Check if a new profile image was selected
+        if (_profileImage != null) {
+          final userId = userProvider.user?.id;
+          if (userId != null) {
+            final profileImageService = ProfileImageService(
+              supabase: Supabase.instance.client,
+            );
+            // Upload the image and get its public URL
+            profileImageUrl = await profileImageService.uploadProfileImage(userId, _profileImage!);
+          }
+        }
+
+        // Update user profile with the new profile image URL (if available)
         await userProvider.updateUserProfile(
           name: _nameController.text,
           email: _emailController.text,
           phone: _phoneController.text,
-          profileImage: _profileImage,
+          profileImage: profileImageUrl,
         );
 
         if (mounted) {
@@ -128,7 +143,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   children: [
                     CircleAvatar(
                       radius: 60,
-                      backgroundColor: theme.colorScheme.surfaceVariant,
+                      backgroundColor: theme.colorScheme.surfaceContainerHighest,
                       backgroundImage: _profileImage != null
                           ? FileImage(_profileImage!)
                           : const AssetImage('assets/logo.png') as ImageProvider,
@@ -140,7 +155,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: theme.shadowColor.withOpacity(0.3),
+                            color: theme.shadowColor.withValues(alpha: 0.3),
                             spreadRadius: 1,
                             blurRadius: 3,
                           ),
@@ -175,7 +190,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your email';
-                  } else if (!RegExp(r'^[\w\-\.\+]+@([\w\-]+\.)+[\w\-]{2,4}$').hasMatch(value)) {
+                  } else if (!RegExp(r'^[\w\-.+]+@([\w\-]+\.)+[\w\-]{2,4}$').hasMatch(value)) {
                     return 'Please enter a valid email address';
                   }
                   return null;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   // Base colors
@@ -60,8 +61,6 @@ class AppTheme {
       onSecondary: isDark ? darkTextPrimary : Colors.white,
       error: errorColor,
       onError: Colors.white,
-      background: background,
-      onBackground: textPrimary,
       surface: surface,
       onSurface: textPrimary,
     );
@@ -72,20 +71,22 @@ class AppTheme {
       colorScheme: colorScheme,
       primaryColor: primaryColor,
       scaffoldBackgroundColor: background,
-
-      // AppBar theme
+      // dart
       appBarTheme: AppBarTheme(
-        backgroundColor: isDark ? darkSurface : primaryColor,
-        foregroundColor: isDark ? darkTextPrimary : Colors.white,
+        backgroundColor: darkSurface,
         elevation: 0,
         centerTitle: true,
-        systemOverlayStyle: SystemUiOverlayStyle(
+        iconTheme: const IconThemeData(color: Colors.white), // menu and back icons white
+        titleTextStyle: const TextStyle(
+          color: Colors.white, // center text white
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
+        systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
-          statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+          statusBarIconBrightness: Brightness.light,
         ),
       ),
-
-      // Button themes
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: primaryColor,
@@ -96,7 +97,6 @@ class AppTheme {
           ),
         ),
       ),
-
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: isDark ? darkTextPrimary : secondaryColor,
@@ -107,8 +107,6 @@ class AppTheme {
           side: BorderSide(color: isDark ? darkTextSecondary : secondaryColor),
         ),
       ),
-
-      // Card theme
       cardTheme: CardTheme(
         elevation: 2,
         shape: RoundedRectangleBorder(
@@ -117,8 +115,6 @@ class AppTheme {
         color: surface,
         margin: const EdgeInsets.all(8),
       ),
-
-      // Input decoration theme
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: isDark ? Colors.grey[800] : Colors.grey[100],
@@ -135,23 +131,26 @@ class AppTheme {
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(color: primaryColor, width: 1),
         ),
-        hintStyle: TextStyle(color: isDark ? darkTextSecondary.withOpacity(0.5) : lightTextSecondary.withOpacity(0.5)),
+        hintStyle: TextStyle(
+          color: isDark
+              ? darkTextSecondary.withOpacity(0.5)
+              : lightTextSecondary.withOpacity(0.5),
+        ),
       ),
-
-      // Text theme
-      textTheme: _buildTextTheme(isDark ? darkTextPrimary : lightTextPrimary,
-          isDark ? darkTextSecondary : lightTextSecondary),
-
-      // Bottom navigation bar theme
+      // Update the text theme using Google Fonts Montserrat.
+      textTheme: GoogleFonts.montserratTextTheme(
+        _buildTextTheme(
+            isDark ? darkTextPrimary : lightTextPrimary,
+            isDark ? darkTextSecondary : lightTextSecondary),
+      ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: surface,
         selectedItemColor: primaryColor,
-        unselectedItemColor: isDark ? darkTextSecondary : lightTextSecondary,
+        unselectedItemColor:
+        isDark ? darkTextSecondary : lightTextSecondary,
         type: BottomNavigationBarType.fixed,
         elevation: 8,
       ),
-
-      // Dialog theme
       dialogTheme: DialogTheme(
         backgroundColor: surface,
         shape: RoundedRectangleBorder(
