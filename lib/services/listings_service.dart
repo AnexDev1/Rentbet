@@ -44,6 +44,8 @@ class ListingsService {
   'description': listing.description,
   'category': listing.category,
   'type': listing.type,
+  'latitude': listing.latitude,
+  'longitude': listing.longitude,
   'created_at': DateTime.now().toIso8601String(),
   'user_id': _supabaseClient.auth.currentUser?.id,
   }).select('id').single();

@@ -203,15 +203,15 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
             },
           ),
         ),
-        IconButton(
-          icon: Icon(
-            Provider.of<ThemeProviders>(context).isDarkMode ? Icons.light_mode : Icons.dark_mode,
-            color: theme.iconTheme.color,
-          ),
-          onPressed: () {
-            Provider.of<ThemeProviders>(context, listen: false).toggleThemeMode();
-          },
-        ),
+        // IconButton(
+        //   icon: Icon(
+        //     Provider.of<ThemeProviders>(context).isDarkMode ? Icons.light_mode : Icons.dark_mode,
+        //     color: theme.iconTheme.color,
+        //   ),
+        //   onPressed: () {
+        //     Provider.of<ThemeProviders>(context, listen: false).toggleThemeMode();
+        //   },
+        // ),
       ],
     );
   }

@@ -1,3 +1,4 @@
+// dart
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:uuid/uuid.dart';
@@ -8,6 +9,7 @@ import '../../../services/listings_service.dart';
 import 'image_step.dart';
 import 'details_step.dart';
 import 'location_step.dart';
+import 'package:latlong2/latlong.dart';
 
 class CreateListingsPage extends StatefulWidget {
   const CreateListingsPage({super.key});
@@ -31,6 +33,10 @@ class _CreateListingsPageState extends State<CreateListingsPage> {
   bool _isLoading = false;
   List<File> _imageFiles = [];
   final ImagePicker _picker = ImagePicker();
+  // Default coordinates to match LocationStep
+  double _latitude = 37.42796133580664;
+  double _longitude = -122.085749655962;
+  bool _isSubmitting = false;
 
   final List<String> _categories = [
     'apartment',
@@ -45,8 +51,8 @@ class _CreateListingsPageState extends State<CreateListingsPage> {
     final List<XFile>? pickedFiles = await _picker.pickMultiImage();
     if (pickedFiles != null && pickedFiles.isNotEmpty) {
       setState(() {
-        _imageFiles.addAll(
-            pickedFiles.map((file) => File(file.path)).toList());
+        _imageFiles
+            .addAll(pickedFiles.map((file) => File(file.path)).toList());
       });
     }
   }
@@ -74,9 +80,8 @@ class _CreateListingsPageState extends State<CreateListingsPage> {
       await Supabase.instance.client.storage
           .from('rentbetStorage')
           .upload(filePath, imageFile);
-      final publicUrl = Supabase.instance.client.storage
-          .from('rentbetStorage')
-          .getPublicUrl(filePath);
+      final publicUrl =
+      Supabase.instance.client.storage.from('rentbetStorage').getPublicUrl(filePath);
       return publicUrl;
     } catch (e) {
       debugPrint('Image upload error: $e');
@@ -85,8 +90,7 @@ class _CreateListingsPageState extends State<CreateListingsPage> {
   }
 
   Future<void> _submitListing() async {
-    if (!_formKey1.currentState!.validate() ||
-        !_formKey2.currentState!.validate()) {
+    if (!_formKey1.currentState!.validate() || !_formKey2.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please fill all required fields'),
@@ -109,7 +113,7 @@ class _CreateListingsPageState extends State<CreateListingsPage> {
     }
 
     setState(() {
-      _isLoading = true;
+      _isSubmitting = true;
     });
 
     try {
@@ -118,7 +122,14 @@ class _CreateListingsPageState extends State<CreateListingsPage> {
         throw Exception('Failed to upload image');
       }
 
+      // Get current user ID from Supabase
+      final userId = Supabase.instance.client.auth.currentUser?.id;
+      if (userId == null) {
+        throw Exception('User not authenticated');
+      }
+
       final listing = Listing(
+        userId: userId, // Add the user ID here
         title: _titleController.text,
         location: _locationController.text,
         price: _priceController.text,
@@ -126,29 +137,38 @@ class _CreateListingsPageState extends State<CreateListingsPage> {
         description: _descriptionController.text,
         category: _selectedCategory,
         type: _selectedType,
+        latitude: _latitude,
+        longitude: _longitude,
       );
 
       await ListingsService().createListing(listing);
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Listing published successfully!'),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+
+      if (mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Listing published successfully!'),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
     }
   }
 
@@ -199,17 +219,9 @@ class _CreateListingsPageState extends State<CreateListingsPage> {
                       child: ElevatedButton(
                         onPressed: details.onStepContinue,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.primaryColor,
-                          foregroundColor:
-                          theme.colorScheme.onPrimary,
-                          padding:
-                          const EdgeInsets.symmetric(vertical: 12),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
-                        child: Text('NEXT',
-                            style: theme.textTheme.bodyLarge
-                                ?.copyWith(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold)),
+                        child: const Text('NEXT'),
                       ),
                     ),
                   if (_currentStep == 2)
@@ -217,17 +229,9 @@ class _CreateListingsPageState extends State<CreateListingsPage> {
                       child: ElevatedButton(
                         onPressed: _submitListing,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.primaryColor,
-                          foregroundColor:
-                          theme.colorScheme.onPrimary,
-                          padding:
-                          const EdgeInsets.symmetric(vertical: 12),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
-                        child: Text('PUBLISH',
-                            style: theme.textTheme.bodyLarge
-                                ?.copyWith(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold)),
+                        child: const Text('PUBLISH'),
                       ),
                     ),
                   if (_currentStep > 0) const SizedBox(width: 12),
@@ -236,14 +240,9 @@ class _CreateListingsPageState extends State<CreateListingsPage> {
                       child: OutlinedButton(
                         onPressed: details.onStepCancel,
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: theme.hintColor,
-                          side: BorderSide(color: theme.hintColor),
-                          padding:
-                          const EdgeInsets.symmetric(vertical: 12),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
-                        child: Text('BACK',
-                            style: theme.textTheme.bodyLarge
-                                ?.copyWith(fontSize: 16)),
+                        child: const Text('BACK'),
                       ),
                     ),
                 ],
@@ -292,7 +291,6 @@ class _CreateListingsPageState extends State<CreateListingsPage> {
                 selectedType: _selectedType,
                 categories: _categories,
                 types: _types,
-                // primaryColor: theme.primaryColor,
               ),
             ),
             Step(
@@ -306,6 +304,10 @@ class _CreateListingsPageState extends State<CreateListingsPage> {
                 locationController: _locationController,
                 primaryColor: theme.primaryColor,
                 secondaryColor: theme.hintColor,
+                onLocationSelected: (LatLng point) {
+                  _latitude = point.latitude;
+                  _longitude = point.longitude;
+                },
               ),
             ),
           ],

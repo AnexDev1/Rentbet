@@ -30,7 +30,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
       final user = userProvider.user;
       if (user != null) {
-        // _nameController.text = user.displayName ?? '';
+        _nameController.text = user.username ?? '';
         _emailController.text = user.email!;
         // _phoneController.text = user.phoneNumber ?? '';
       }
@@ -54,29 +54,36 @@ class _EditProfilePageState extends State<EditProfilePage> {
       setState(() {
         _isLoading = true;
       });
+
       try {
         final userProvider = Provider.of<UserProvider>(context, listen: false);
         String? profileImageUrl;
 
-        // Check if a new profile image was selected
+        // Upload new image if selected
         if (_profileImage != null) {
           final userId = userProvider.user?.id;
           if (userId != null) {
-            final profileImageService = ProfileImageService(
-              supabase: Supabase.instance.client,
+            final profileImageService = ProfileImageService();
+            profileImageUrl = await profileImageService.uploadProfileImage(
+                userId,
+                _profileImage!
             );
-            // Upload the image and get its public URL
-            profileImageUrl = await profileImageService.uploadProfileImage(userId, _profileImage!);
           }
+        } else {
+          // Keep existing profile image if no new one is selected
+          profileImageUrl = userProvider.user?.profileImage;
         }
 
-        // Update user profile with the new profile image URL (if available)
+        // Update user profile data including the image
         await userProvider.updateUserProfile(
           name: _nameController.text,
           email: _emailController.text,
-          phone: _phoneController.text,
+          // phone: _phoneController.text,
           profileImage: profileImageUrl,
         );
+
+        // Force refresh UI immediately
+        userProvider.notifyListeners();
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -126,9 +133,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
+      body:  SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
@@ -146,6 +151,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       backgroundColor: theme.colorScheme.surfaceContainerHighest,
                       backgroundImage: _profileImage != null
                           ? FileImage(_profileImage!)
+                          : (Provider.of<UserProvider>(context).user?.profileImage != null &&
+                          Provider.of<UserProvider>(context).user!.profileImage!.isNotEmpty)
+                          ? NetworkImage(Provider.of<UserProvider>(context).user!.profileImage!)
                           : const AssetImage('assets/logo.png') as ImageProvider,
                     ),
                     Container(
@@ -201,14 +209,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: _saveProfile,
+                  onPressed: _isLoading ? null : _saveProfile,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: theme.buttonTheme.colorScheme?.primary ?? theme.primaryColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25),
                     ),
                   ),
-                  child: Text(
+                  child: _isLoading
+                      ? SizedBox(
+                    height: 24,
+                    width: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.onPrimary),
+                    ),
+                  )
+                      : Text(
                     'Save Changes',
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: theme.colorScheme.onPrimary,

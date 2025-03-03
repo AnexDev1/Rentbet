@@ -9,9 +9,9 @@ class MapView extends StatefulWidget {
 
   const MapView({
     Key? key,
-    this.latitude = 37.42796133580664,  // Default coordinates
-    this.longitude = -122.085749655962,
-    this.title = 'Property Location'
+    this.latitude,
+    this.longitude,
+    this.title = 'Property Location',
   }) : super(key: key);
 
   @override
@@ -29,7 +29,10 @@ class _MapViewState extends State<MapView> {
 
   @override
   Widget build(BuildContext context) {
-    final LatLng propertyLocation = LatLng(widget.latitude!, widget.longitude!);
+    final LatLng propertyLocation = LatLng(
+      widget.latitude ?? 0.0,
+      widget.longitude ?? 0.0,
+    );
 
     return SizedBox(
       height: 200,
@@ -41,9 +44,6 @@ class _MapViewState extends State<MapView> {
           options: MapOptions(
             initialCenter: propertyLocation,
             initialZoom: 15.0,
-            interactionOptions: InteractionOptions(
-              flags: InteractiveFlag.all,
-            ),
           ),
           children: [
             TileLayer(
@@ -58,7 +58,7 @@ class _MapViewState extends State<MapView> {
                   width: 40,
                   height: 40,
                   child: Tooltip(
-                    message: widget.title!,
+                    message: widget.title ?? 'Property Location',
                     child: const Icon(
                       Icons.location_on,
                       color: Colors.red,

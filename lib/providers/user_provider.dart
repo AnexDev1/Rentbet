@@ -2,6 +2,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:rentbet/services/user_service.dart';
 
 import '../models/user_model.dart';
@@ -15,14 +16,15 @@ class UserProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   bool _dataLoaded = false;
   bool get isDataLoaded => _dataLoaded;
+
   Future<void> fetchUserData() async {
     try {
       _isLoading = true;
       notifyListeners();
 
-      // Replace with your actual user service implementation
       final userData = await UserService().getCurrentUser();
       _user = userData;
+      _dataLoaded = true;
 
     } catch (error) {
       print('Error fetching user data: $error');
@@ -30,49 +32,53 @@ class UserProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
-    _dataLoaded =true;
   }
+
   Future<void> updateUserProfile({
     required String name,
     required String email,
-    String? phone,
+    // String? phone,
     String? profileImage,
   }) async {
     try {
       _isLoading = true;
       notifyListeners();
 
-      // 1. Upload image if provided
-      String? photoURL;
-      if (profileImage != null) {
-        photoURL = await _uploadProfileImage(profileImage);
+      // Add cache-busting parameter to prevent caching issues
+      String? processedImageUrl = profileImage;
+      if (profileImage != null && profileImage.isNotEmpty) {
+        if (!profileImage.contains('?')) {
+          processedImageUrl = '$profileImage?t=${DateTime.now().millisecondsSinceEpoch}';
+        }
       }
 
-      // 2. Update user profile in database
+      // Update user profile in database
       final userService = UserService();
       await userService.updateUserProfile(
         username: name,
+        profileImage: processedImageUrl, // Pass the processed image URL
       );
 
-      // 3. Fetch fresh data to update the UI with new values
+      // Update local user object immediately instead of refetching
+      _user = _user?.copyWith(
+        username: name,
+        email: email,
+        // phoneNumber: phone,
+        profileImage: processedImageUrl,
+      );
+
+      // Clear image cache to force reload
+      imageCache.clear();
+      imageCache.clearLiveImages();
+
+      // Then fetch fresh data to ensure UI is updated
       await fetchUserData();
+
     } catch (error) {
       print('Error updating user profile: $error');
-      // Consider showing an error message to the user
     } finally {
       _isLoading = false;
       notifyListeners();
     }
-  }
-  Future<String> _uploadProfileImage(String imageFile) async {
-    // Implement file upload to storage
-    // This would connect to your storage service (Firebase, Supabase, etc.)
-    // Return the URL of the uploaded image
-
-    // Placeholder implementation:
-    final fileName = 'profile_${DateTime.now().millisecondsSinceEpoch}.jpg';
-    // Upload to storage and get URL
-    // ...
-    return 'https://example.com/$fileName'; // Replace with actual URL
   }
 }

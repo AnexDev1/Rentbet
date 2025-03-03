@@ -1,5 +1,6 @@
 // lib/views/profile/widgets/sign_out_button.dart
 import 'package:flutter/material.dart';
+import 'package:rentbet/views/auth/auth_page.dart';
 import '../../../services/auth_service.dart';
 
 class SignOutButton extends StatelessWidget {
@@ -99,7 +100,7 @@ class SignOutButton extends StatelessWidget {
                     ),
                     const SizedBox(width: 8.0),
                     ElevatedButton(
-                      onPressed: () => Navigator.pop(context, true),
+                      onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context)=> AuthPage(),),),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.redAccent,
                         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),

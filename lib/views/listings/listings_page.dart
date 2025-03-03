@@ -1,4 +1,3 @@
-// dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -130,6 +129,38 @@ class _ListingsPageState extends State<ListingsPage>
           itemBuilder: (context, index) => const ListingCardSkeleton(),
         ),
       );
+    } else if (filteredListings.isEmpty) {
+      // Empty state when no properties are available
+      listingCardsSection = Container(
+        margin: const EdgeInsets.only(top: 16),
+        height: 250,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.home_work_outlined,
+                size: 70,
+                color: theme.disabledColor,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'No properties available',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: theme.disabledColor,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Try changing your filters or category',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.disabledColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
     } else {
       listingCardsSection = AnimatedSwitcher(
         duration: const Duration(milliseconds: 200),
@@ -159,6 +190,7 @@ class _ListingsPageState extends State<ListingsPage>
                       builder: (context) => DetailsPage(
                         property: {
                           'id': listing.id,
+                          'userId': listing.userId,
                           'imageUrl': listing.imageUrl,
                           'price': '\$${listing.price}',
                           'location': listing.location,
@@ -166,6 +198,8 @@ class _ListingsPageState extends State<ListingsPage>
                           'desc': listing.description,
                           'category': listing.category,
                           'type': listing.type,
+                          'latitude': listing.latitude.toString(),
+                          'longitude': listing.longitude.toString(),
                         },
                       ),
                     ),
@@ -185,14 +219,12 @@ class _ListingsPageState extends State<ListingsPage>
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              // SearchBarWidget will pick theme colors for text and background.
               SearchBarWidget(
                 onFilter: (filter) {
                   Provider.of<ListingsProvider>(context, listen: false)
                       .fetchListingsByType(filter);
                 },
               ),
-              // CategoryTabs styled with theme fonts and colors.
               CategoryTabs(
                 categories: _categories,
                 selectedIndex: _selectedCategoryIndex,
@@ -208,12 +240,14 @@ class _ListingsPageState extends State<ListingsPage>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       listingCardsSection,
-                      const SizedBox(height: 16),
-                      BestForYou(
-                        listings: bestForYouList,
-                        category: _categories[_selectedCategoryIndex],
-                        isLoading: provider.isLoading,
-                      ),
+                      if (filteredListings.isNotEmpty) ...[
+                        const SizedBox(height: 16),
+                        BestForYou(
+                          listings: bestForYouList,
+                          category: _categories[_selectedCategoryIndex],
+                          isLoading: provider.isLoading,
+                        ),
+                      ],
                     ],
                   ),
                 ),

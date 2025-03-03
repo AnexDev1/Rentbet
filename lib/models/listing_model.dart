@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 class Listing {
   final String id;
   final String userId;
@@ -8,11 +10,14 @@ class Listing {
   final String description;
   final String category;
   final String type;
+  final double latitude;
+  final double longitude;
 
   Listing({
     this.id = '',
     this.userId = '',
-
+    required this.latitude ,
+    required this.longitude ,
     this.title = '',
     this.location = '',
     this.price = '',  // Default to empty string
@@ -31,6 +36,8 @@ class Listing {
       description: map['description']?.toString() ?? '',
       category: map['category']?.toString() ?? '',
       type: map['type']?.toString() ?? '',
+      latitude: map['latitude']?.toDouble() ?? 0.0,
+      longitude: map['longitude']?.toDouble() ?? 0.0,
       // Parse price directly to string with proper formatting
       price: _parsePriceToString(map['price']),
       imageUrl: map['imageUrl']?.toString() ?? map['image_url']?.toString() ?? '',
@@ -66,6 +73,8 @@ class Listing {
       'description': description,
       'type': type,
       'category': category,
+      'latitude': latitude,
+      'longitude': longitude,
     };
   }
 }

@@ -3,10 +3,9 @@ import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfileImageService {
-  final SupabaseClient supabase;
   final String bucketId;
-
-  ProfileImageService({required this.supabase, this.bucketId = 'rentbetStorage'});
+final SupabaseClient supabase = Supabase.instance.client;
+  ProfileImageService({ this.bucketId = 'rentbetStorage'});
 
   /// Uploads a profile image and returns its public URL,
   /// [userId] is used for generating a unique file path.

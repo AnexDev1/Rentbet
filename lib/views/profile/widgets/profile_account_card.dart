@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import '../edit_profile_page.dart';
 import '../createListing/create_listings_page.dart';
+import '../settings_page.dart';
 import 'profile_utils.dart';
 
 class ProfileAccountCard extends StatelessWidget {
@@ -84,12 +85,10 @@ class ProfileAccountCard extends StatelessWidget {
                 Icons.settings_outlined,
                 'Settings',
                 onTap: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => const ThemeSelector(),
-                  //   ),
-                  // );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const SettingsPage()),
+                  );
                 },
                 iconColor: primaryText,
                 textColor: primaryText,

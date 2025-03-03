@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:rentbet/controllers/details_controller.dart';
 import 'package:rentbet/views/details/widgets/gallery_skeleton.dart';
@@ -137,10 +138,8 @@ class _DetailsPageState extends State<DetailsPage> with AutomaticKeepAliveClient
                             ),
                             const SizedBox(height: 24),
                             UserProfileSection(
-
-                              onMessage: () {
-                                // Message action.
-                              },
+                        property:  widget.property ,
+                              onMessage: (){},
                             ),
                             const SizedBox(height: 24),
                             const Text(
@@ -162,7 +161,12 @@ class _DetailsPageState extends State<DetailsPage> with AutomaticKeepAliveClient
                               },
                             ),
                             const SizedBox(height: 24),
-                            const MapView(),
+                            // dart
+                            MapView(
+                              latitude: double.tryParse(widget.property['latitude'] ?? '0') ?? 0.0,
+                              longitude: double.tryParse(widget.property['longitude'] ?? '0') ?? 0.0,
+                              title: widget.property['title'] ?? 'Property Location',
+                            ),
                             const SizedBox(height: 100),
                           ],
                         ),
