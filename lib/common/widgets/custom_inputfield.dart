@@ -32,7 +32,7 @@ class CustomInputField extends StatelessWidget {
       controller: controller,
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-        prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
+        prefixIcon: prefixIcon != null ? Icon(prefixIcon,color: Colors.black54,) : null,
         suffixIcon: suffixIcon,
         labelText: labelText,
         labelStyle: const TextStyle(color: Colors.grey),

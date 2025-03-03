@@ -165,16 +165,14 @@ class _OnboardingPageState extends State<OnboardingPage> {
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             minimumSize: const Size(150, 0),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 32, vertical: 12),
+                            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                            backgroundColor: Colors.white,
+                            foregroundColor: Colors.black87,
                           ),
                           onPressed: () {
                             _onAuthPressed(const AuthPage(showSignup: true));
                           },
-                          child: const Text(
-                            r"Join",
-                            style: TextStyle(fontSize: 15, color: Colors.black),
-                          ),
+                          child: const Text(r"Join", style: TextStyle(fontSize: 15)),
                         ),
                         OutlinedButton(
                           style: OutlinedButton.styleFrom(
