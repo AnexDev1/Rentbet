@@ -1,15 +1,16 @@
 // dart
 import 'package:flutter/material.dart';
 
-class DetailsStep extends StatelessWidget {
+class DetailsStep extends StatefulWidget {
   final GlobalKey<FormState> formKey;
   final TextEditingController titleController;
   final TextEditingController priceController;
   final TextEditingController descriptionController;
-  final String selectedCategory;
-  final String selectedType;
+  final String initialCategory;
+  final String initialType;
   final List<String> categories;
   final List<String> types;
+  final void Function(String category, String type) onValuesChanged;
 
   const DetailsStep({
     super.key,
@@ -17,17 +18,36 @@ class DetailsStep extends StatelessWidget {
     required this.titleController,
     required this.priceController,
     required this.descriptionController,
-    required this.selectedCategory,
-    required this.selectedType,
+    required this.initialCategory,
+    required this.initialType,
     required this.categories,
     required this.types,
+    required this.onValuesChanged,
   });
+
+  @override
+  State<DetailsStep> createState() => _DetailsStepState();
+}
+
+class _DetailsStepState extends State<DetailsStep> {
+  late String selectedCategory;
+  late String selectedType;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedCategory = widget.initialCategory;
+    selectedType = widget.initialType;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.onValuesChanged(selectedCategory, selectedType);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Form(
-      key: formKey,
+      key: widget.formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -40,7 +60,7 @@ class DetailsStep extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           TextFormField(
-            controller: titleController,
+            controller: widget.titleController,
             decoration: InputDecoration(
               labelText: 'Property Title',
               prefixIcon: Icon(Icons.title, color: theme.iconTheme.color),
@@ -57,12 +77,11 @@ class DetailsStep extends StatelessWidget {
                 borderSide: BorderSide(color: theme.primaryColor),
               ),
             ),
-            validator: (value) =>
-            value?.isEmpty ?? true ? 'Please enter title' : null,
+            validator: (value) => value?.isEmpty ?? true ? 'Please enter title' : null,
           ),
           const SizedBox(height: 16),
           TextFormField(
-            controller: priceController,
+            controller: widget.priceController,
             decoration: InputDecoration(
               labelText: 'Price',
               prefixIcon: Icon(Icons.attach_money, color: theme.iconTheme.color),
@@ -80,8 +99,7 @@ class DetailsStep extends StatelessWidget {
               ),
             ),
             keyboardType: TextInputType.number,
-            validator: (value) =>
-            value?.isEmpty ?? true ? 'Please enter price' : null,
+            validator: (value) => value?.isEmpty ?? true ? 'Please enter price' : null,
           ),
           const SizedBox(height: 16),
           DropdownButtonFormField<String>(
@@ -94,7 +112,7 @@ class DetailsStep extends StatelessWidget {
                 borderSide: BorderSide(color: theme.dividerColor),
               ),
             ),
-            items: categories.map((category) {
+            items: widget.categories.map((category) {
               return DropdownMenuItem<String>(
                 value: category,
                 child: Text(category, style: theme.textTheme.bodyLarge),
@@ -102,7 +120,10 @@ class DetailsStep extends StatelessWidget {
             }).toList(),
             onChanged: (value) {
               if (value != null) {
-                // Handle category change if needed
+                setState(() {
+                  selectedCategory = value;
+                });
+                widget.onValuesChanged(selectedCategory, selectedType);
               }
             },
           ),
@@ -117,7 +138,7 @@ class DetailsStep extends StatelessWidget {
                 borderSide: BorderSide(color: theme.dividerColor),
               ),
             ),
-            items: types.map((type) {
+            items: widget.types.map((type) {
               return DropdownMenuItem<String>(
                 value: type,
                 child: Text(type, style: theme.textTheme.bodyLarge),
@@ -125,13 +146,16 @@ class DetailsStep extends StatelessWidget {
             }).toList(),
             onChanged: (value) {
               if (value != null) {
-                // Handle type change if needed
+                setState(() {
+                  selectedType = value;
+                });
+                widget.onValuesChanged(selectedCategory, selectedType);
               }
             },
           ),
           const SizedBox(height: 16),
           TextFormField(
-            controller: descriptionController,
+            controller: widget.descriptionController,
             decoration: InputDecoration(
               labelText: 'Description',
               alignLabelWithHint: true,

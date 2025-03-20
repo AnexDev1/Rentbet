@@ -7,11 +7,11 @@ class CategoryTabs extends StatelessWidget {
   final ValueChanged<int> onTabSelected;
 
   const CategoryTabs({
-    Key? key,
+    super.key,
     required this.categories,
     required this.selectedIndex,
     required this.onTabSelected,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

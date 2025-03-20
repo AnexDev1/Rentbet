@@ -1,21 +1,22 @@
-// lib/providers/user_provider.dart
-import 'dart:io';
-
+// file: lib/providers/user_provider.dart
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:rentbet/services/user_service.dart';
-
 import '../models/user_model.dart';
-import '../services/auth_service.dart';
+import '../services/user_service.dart';
 
 class UserProvider extends ChangeNotifier {
   Users? _user;
   bool _isLoading = false;
+  bool _dataLoaded = false;
 
   Users? get user => _user;
   bool get isLoading => _isLoading;
-  bool _dataLoaded = false;
   bool get isDataLoaded => _dataLoaded;
+
+  void setUser(Users user) {
+    _user = user;
+    _dataLoaded = true;
+    notifyListeners();
+  }
 
   Future<void> fetchUserData() async {
     try {
@@ -25,7 +26,6 @@ class UserProvider extends ChangeNotifier {
       final userData = await UserService().getCurrentUser();
       _user = userData;
       _dataLoaded = true;
-
     } catch (error) {
       print('Error fetching user data: $error');
     } finally {
@@ -34,17 +34,21 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
+  void clearUser() {
+    _user = null;
+    _dataLoaded = false;
+    notifyListeners();
+  }
+
   Future<void> updateUserProfile({
     required String name,
     required String email,
-    // String? phone,
     String? profileImage,
   }) async {
     try {
       _isLoading = true;
       notifyListeners();
 
-      // Add cache-busting parameter to prevent caching issues
       String? processedImageUrl = profileImage;
       if (profileImage != null && profileImage.isNotEmpty) {
         if (!profileImage.contains('?')) {
@@ -52,28 +56,22 @@ class UserProvider extends ChangeNotifier {
         }
       }
 
-      // Update user profile in database
       final userService = UserService();
       await userService.updateUserProfile(
         username: name,
-        profileImage: processedImageUrl, // Pass the processed image URL
-      );
-
-      // Update local user object immediately instead of refetching
-      _user = _user?.copyWith(
-        username: name,
-        email: email,
-        // phoneNumber: phone,
         profileImage: processedImageUrl,
       );
 
-      // Clear image cache to force reload
+      _user = _user?.copyWith(
+        username: name,
+        email: email,
+        profileImage: processedImageUrl,
+      );
+
       imageCache.clear();
       imageCache.clearLiveImages();
 
-      // Then fetch fresh data to ensure UI is updated
       await fetchUserData();
-
     } catch (error) {
       print('Error updating user profile: $error');
     } finally {

@@ -34,7 +34,7 @@ class _LoginTabState extends State<LoginTab> {
       _isLoading = true;
     });
 
-    bool loggedIn = await _authService.login(email, password);
+    bool loggedIn = await _authService.login(email, password, context);
 
     setState(() {
       _isLoading = false;

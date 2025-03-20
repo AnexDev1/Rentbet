@@ -1,5 +1,6 @@
 // dart
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:rentbet/views/listings/category_listing_page.dart';
 import '../../../models/listing_model.dart';
 import '../../details/details_page.dart';
@@ -51,19 +52,28 @@ class BestForYou extends StatelessWidget {
             ? const BestForYouSkeleton()
             : Column(
           children: listings.map((listing) {
+            // Convert and format the price value.
+            final Object priceValue = listing.price is num
+                ? listing.price
+                : num.tryParse(listing.price.toString()) ?? 0;
+            final formattedPrice = NumberFormat('#,###').format(priceValue);
+
             return GestureDetector(
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (_) => DetailsPage(property: {
+                      'id': listing.id,
+                      'userId': listing.userId,
                       'imageUrl': listing.imageUrl,
-                      'price': '\$${listing.price}',
+                      'price': '\$$formattedPrice',
                       'location': listing.location,
                       'title': listing.title,
                       'desc': listing.description,
                       'category': listing.category,
                       'type': listing.type,
+
                     }),
                   ),
                 );
@@ -94,7 +104,7 @@ class BestForYou extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Price: \$${listing.price}',
+                            'Price: \$$formattedPrice ETB',
                             style: theme.textTheme.bodyMedium?.copyWith(color: theme.textTheme.bodySmall?.color),
                           ),
                         ],

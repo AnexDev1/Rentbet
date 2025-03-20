@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rentbet/common/widgets/sign_out_button.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../providers/user_provider.dart';
 import 'widgets/profile_app_bar.dart';
 import 'widgets/profile_stats_card.dart';
@@ -29,6 +30,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final userEmail = Supabase.instance.client.auth.currentUser?.email ?? '';
+    final canCreateListing = (userEmail == 'anexo@gmail.com');
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: CustomScrollView(
@@ -42,11 +45,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Column(
-                    children: const [
-                      ProfileAccountCard(),
-                      SizedBox(height: 16),
-                      ProfileSettingsCard(),
-                      SizedBox(height: 24),
+                    children: [
+                      ProfileAccountCard(canCreateListing: canCreateListing),
+                      const SizedBox(height: 16),
+                      const ProfileSettingsCard(),
+                      const SizedBox(height: 24),
                     ],
                   ),
                 ),

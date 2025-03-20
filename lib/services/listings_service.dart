@@ -31,7 +31,7 @@ class ListingsService {
         .eq('id', id)
         .single();
     return Listing.fromMap(response);
-      return null;
+
   }
 
   Future<String> createListing(Listing listing) async {
@@ -41,6 +41,7 @@ class ListingsService {
   'location': listing.location,
   'price': listing.price,
   'image_url': listing.imageUrl,
+  'gallery_images': listing.galleryImages,
   'description': listing.description,
   'category': listing.category,
   'type': listing.type,

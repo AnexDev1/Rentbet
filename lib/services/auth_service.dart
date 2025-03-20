@@ -1,16 +1,35 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:rentbet/models/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../providers/user_provider.dart';
 final supabase = Supabase.instance.client;
 
 class AuthService {
-  Future<bool> login(String email, String password) async {
+// dart
+  Future<bool> login(String email, String password, BuildContext context) async {
     try {
       final response = await supabase.auth.signInWithPassword(
         email: email,
         password: password,
       );
-      return response.session != null;
+      if (response.session != null && response.user != null) {
+        // Fetch the user details from the 'users' table
+        final userResponse = await supabase
+            .from('users')
+            .select()
+            .eq('id', response.user!.id)
+            .single();
+
+        // Update the provider with fresh user data
+        final user = Users.fromJson(userResponse);
+        Provider.of<UserProvider>(context, listen: false).setUser(user);
+
+        return true;
+      }
+      return false;
     } catch (e) {
-      // Handle login error
       print('Login error: $e');
       return false;
     }

@@ -13,7 +13,7 @@ class ThemeProviders with ChangeNotifier {
 
   Future<void> _loadThemePreference() async {
     final prefs = await SharedPreferences.getInstance();
-    final themeModeIndex = prefs.getInt('theme_mode') ?? 2; // Default to system
+    final themeModeIndex = prefs.getInt('theme_mode') ?? 1;
     _themeMode = ThemeMode.values[themeModeIndex];
     notifyListeners();
   }

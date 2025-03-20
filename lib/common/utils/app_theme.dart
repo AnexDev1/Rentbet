@@ -1,3 +1,4 @@
+// File: lib/common/utils/app_theme.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -71,20 +72,19 @@ class AppTheme {
       colorScheme: colorScheme,
       primaryColor: primaryColor,
       scaffoldBackgroundColor: background,
-      // dart
       appBarTheme: AppBarTheme(
-        backgroundColor: darkSurface,
+        backgroundColor: brightness == Brightness.light ? lightSurface : darkSurface,
         elevation: 0,
         centerTitle: true,
-        iconTheme: const IconThemeData(color: Colors.white), // menu and back icons white
-        titleTextStyle: const TextStyle(
-          color: Colors.white, // center text white
+        iconTheme: IconThemeData(color: brightness == Brightness.light ? primaryColor : Colors.white),
+        titleTextStyle: TextStyle(
+          color: brightness == Brightness.light ? primaryColor : Colors.white,
           fontSize: 18,
           fontWeight: FontWeight.bold,
         ),
-        systemOverlayStyle: const SystemUiOverlayStyle(
+        systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.light,
+          statusBarIconBrightness: brightness == Brightness.light ? Brightness.dark : Brightness.light,
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -117,7 +117,8 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: isDark ? Colors.grey[800] : Colors.grey[100],
+        // Use the light theme surface (white) when in light mode.
+        fillColor: isDark ? Colors.grey[800] : lightSurface,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
@@ -137,17 +138,16 @@ class AppTheme {
               : lightTextSecondary.withOpacity(0.5),
         ),
       ),
-      // Update the text theme using Google Fonts Montserrat.
       textTheme: GoogleFonts.montserratTextTheme(
         _buildTextTheme(
-            isDark ? darkTextPrimary : lightTextPrimary,
-            isDark ? darkTextSecondary : lightTextSecondary),
+          isDark ? darkTextPrimary : lightTextPrimary,
+          isDark ? darkTextSecondary : lightTextSecondary,
+        ),
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: surface,
         selectedItemColor: primaryColor,
-        unselectedItemColor:
-        isDark ? darkTextSecondary : lightTextSecondary,
+        unselectedItemColor: isDark ? darkTextSecondary : lightTextSecondary,
         type: BottomNavigationBarType.fixed,
         elevation: 8,
       ),

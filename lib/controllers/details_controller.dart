@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/listing_model.dart';
 import '../providers/wishlist_provider.dart';
-import '../services/listings_service.dart';
 
 class DetailsController extends ChangeNotifier {
   final WishlistProvider _wishlistProvider;
@@ -19,16 +19,28 @@ class DetailsController extends ChangeNotifier {
     );
   }
 
-  Future<void> loadGalleryImages(String category) async {
-    isGalleryLoading = true;
-    notifyListeners();
+  Future<void> loadGalleryImages(String listingId) async {
+    try {
+      // Query by the listing id to get gallery_images
+      final response = await Supabase.instance.client
+          .from('listings')
+          .select('gallery_images')
+          .eq('id', listingId)
+          .single();
 
-    final images = await ListingsService().fetchGalleryImagesByCategory(category);
-    galleryImages = images;
-    isGalleryLoading = false;
-    notifyListeners();
+      if (response['gallery_images'] != null) {
+        galleryImages = List<String>.from(response['gallery_images']);
+      } else {
+        galleryImages = [];
+      }
+    } catch (e) {
+      print('Error fetching gallery images: $e');
+      galleryImages = [];
+    } finally {
+      isGalleryLoading = false;
+      notifyListeners();
+    }
   }
-
   // Update bookmark state from WishlistProvider
   void loadBookmarkState(String propertyId) {
     isBookmarked = _wishlistProvider.isBookmarked(propertyId);

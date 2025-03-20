@@ -6,7 +6,8 @@ import '../settings_page.dart';
 import 'profile_utils.dart';
 
 class ProfileAccountCard extends StatelessWidget {
-  const ProfileAccountCard({super.key});
+  final bool canCreateListing;
+  const ProfileAccountCard({super.key, required this.canCreateListing});
 
   @override
   Widget build(BuildContext context) {
@@ -64,21 +65,22 @@ class ProfileAccountCard extends StatelessWidget {
                 textColor: primaryText,
               ),
               Divider(height: 1, indent: 56, color: theme.dividerColor),
-              ProfileUtils.buildListTile(
-                context,
-                Icons.bookmark_outline,
-                'Create Listings',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const CreateListingsPage(),
-                    ),
-                  );
-                },
-                iconColor: primaryText,
-                textColor: primaryText,
-              ),
+              if (canCreateListing)
+                ProfileUtils.buildListTile(
+                  context,
+                  Icons.bookmark_outline,
+                  'Create Listings',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CreateListingsPage(),
+                      ),
+                    );
+                  },
+                  iconColor: primaryText,
+                  textColor: primaryText,
+                ),
               Divider(height: 1, indent: 56, color: theme.dividerColor),
               ProfileUtils.buildListTile(
                 context,
@@ -87,7 +89,9 @@ class ProfileAccountCard extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const SettingsPage()),
+                    MaterialPageRoute(
+                      builder: (context) => const SettingsPage(),
+                    ),
                   );
                 },
                 iconColor: primaryText,

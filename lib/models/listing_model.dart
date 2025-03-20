@@ -1,12 +1,13 @@
-import 'dart:ffi';
+
 
 class Listing {
   final String id;
   final String userId;
   final String title;
   final String location;
-  final String price;  // Changed to String type
+  final String price;
   final String imageUrl;
+  final List<String>? galleryImages;
   final String description;
   final String category;
   final String type;
@@ -20,14 +21,23 @@ class Listing {
     required this.longitude ,
     this.title = '',
     this.location = '',
-    this.price = '',  // Default to empty string
+    this.price = '',
     this.imageUrl = '',
+    this.galleryImages,
     this.description = '',
     this.category = '',
     this.type = '',
   });
 
   factory Listing.fromMap(Map<String, dynamic> map) {
+    double parseToDouble(dynamic value) {
+      if (value is String) {
+        return double.tryParse(value) ?? 0.0;
+      } else if (value is num) {
+        return value.toDouble();
+      }
+      return 0.0;
+    }
     return Listing(
       id: map['id']?.toString() ?? '',
       userId: map['user_id']?.toString() ?? '',
@@ -36,11 +46,12 @@ class Listing {
       description: map['description']?.toString() ?? '',
       category: map['category']?.toString() ?? '',
       type: map['type']?.toString() ?? '',
-      latitude: map['latitude']?.toDouble() ?? 0.0,
-      longitude: map['longitude']?.toDouble() ?? 0.0,
+      latitude: parseToDouble(map['latitude']),
+      longitude: parseToDouble(map['longitude']),
       // Parse price directly to string with proper formatting
       price: _parsePriceToString(map['price']),
       imageUrl: map['imageUrl']?.toString() ?? map['image_url']?.toString() ?? '',
+      galleryImages: map['gallery_images'] !=null ? List<String>.from(map['gallery_images']) : [],
     );
   }
 
@@ -70,6 +81,7 @@ class Listing {
       'location': location,
       'price': price,  // Price is already a string
       'image_url': imageUrl,
+      'gallery_images': galleryImages,
       'description': description,
       'type': type,
       'category': category,

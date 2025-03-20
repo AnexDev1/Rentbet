@@ -1,4 +1,4 @@
-// dart
+
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:uuid/uuid.dart';
@@ -21,7 +21,6 @@ class CreateListingsPage extends StatefulWidget {
 class _CreateListingsPageState extends State<CreateListingsPage> {
   final _formKey1 = GlobalKey<FormState>();
   final _formKey2 = GlobalKey<FormState>();
-  final _formKey3 = GlobalKey<FormState>();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
@@ -30,7 +29,7 @@ class _CreateListingsPageState extends State<CreateListingsPage> {
   String _selectedCategory = 'apartment';
   String _selectedType = 'rent';
   int _currentStep = 0;
-  bool _isLoading = false;
+  final bool _isLoading = false;
   List<File> _imageFiles = [];
   final ImagePicker _picker = ImagePicker();
   // Default coordinates to match LocationStep
@@ -117,10 +116,15 @@ class _CreateListingsPageState extends State<CreateListingsPage> {
     });
 
     try {
-      final imageUrl = await _uploadImage(_imageFiles.first);
-      if (imageUrl == null) {
-        throw Exception('Failed to upload image');
+      List<String> galleryUrls = [];
+      for (final file in _imageFiles) {
+        final url = await _uploadImage(file);
+        if (url != null) {
+          galleryUrls.add(url);
+        }
       }
+
+      if (galleryUrls.isEmpty) throw Exception('Failed to upload images');
 
       // Get current user ID from Supabase
       final userId = Supabase.instance.client.auth.currentUser?.id;
@@ -133,7 +137,8 @@ class _CreateListingsPageState extends State<CreateListingsPage> {
         title: _titleController.text,
         location: _locationController.text,
         price: _priceController.text,
-        imageUrl: imageUrl,
+        imageUrl: galleryUrls[0],
+        galleryImages: galleryUrls,
         description: _descriptionController.text,
         category: _selectedCategory,
         type: _selectedType,
@@ -231,7 +236,16 @@ class _CreateListingsPageState extends State<CreateListingsPage> {
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
-                        child: const Text('PUBLISH'),
+                        child: _isSubmitting
+                            ? SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                            : const Text('PUBLISH'),
                       ),
                     ),
                   if (_currentStep > 0) const SizedBox(width: 12),
@@ -287,10 +301,16 @@ class _CreateListingsPageState extends State<CreateListingsPage> {
                 titleController: _titleController,
                 priceController: _priceController,
                 descriptionController: _descriptionController,
-                selectedCategory: _selectedCategory,
-                selectedType: _selectedType,
+                initialCategory: _selectedCategory,
+                initialType: _selectedType,
                 categories: _categories,
                 types: _types,
+                onValuesChanged: (category, type){
+                  setState(() {
+                    _selectedCategory = category;
+                    _selectedType = type;
+                  });
+                },
               ),
             ),
             Step(

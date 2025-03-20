@@ -32,7 +32,14 @@ class Users {
       profileImage: profileImage ?? this.profileImage,
     );
   }
-
+  factory Users.fromJson(Map<String, dynamic> json) {
+    return Users(
+      id: json['id'] as String,
+      username: json['username'] as String,
+      email: json['email'] as String,
+      profileImage: json['profileImage'] as String?,
+    );
+  }
   // Keep your existing fromMap method
   factory Users.fromMap(Map<String, dynamic> map) {
     return Users(

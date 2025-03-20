@@ -1,9 +1,9 @@
+// dart
 import 'package:flutter/material.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:rentbet/controllers/details_controller.dart';
 import 'package:rentbet/views/details/widgets/gallery_skeleton.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../models/listing_model.dart';
 import '../../providers/wishlist_provider.dart';
 import 'details_helpers.dart';
@@ -13,13 +13,14 @@ import '/views/details/widgets/map_view.dart';
 
 class DetailsPage extends StatefulWidget {
   final Map<String, String> property;
-  const DetailsPage({Key? key, required this.property}) : super(key: key);
+  const DetailsPage({super.key, required this.property});
 
   @override
   _DetailsPageState createState() => _DetailsPageState();
 }
 
-class _DetailsPageState extends State<DetailsPage> with AutomaticKeepAliveClientMixin {
+class _DetailsPageState extends State<DetailsPage>
+    with AutomaticKeepAliveClientMixin {
   late DetailsController _controller;
 
   @override
@@ -28,26 +29,36 @@ class _DetailsPageState extends State<DetailsPage> with AutomaticKeepAliveClient
   @override
   void initState() {
     super.initState();
-    // Get WishlistProvider and inject it into controller
-    final wishlistProvider = Provider.of<WishlistProvider>(context, listen: false);
+    final wishlistProvider =
+    Provider.of<WishlistProvider>(context, listen: false);
     _controller = DetailsController(wishlistProvider);
+    final listingId = widget.property['id'] ?? '';
+    _controller.loadGalleryImages(listingId);
 
-    final category = widget.property['category'] ?? '';
-    _controller.loadGalleryImages(category);
 
-    // Load bookmark state from WishlistProvider
-    final id = widget.property['id'];
-    if (id != null && id.isNotEmpty) {
-      _controller.loadBookmarkState(id);
+    if (listingId.isNotEmpty) {
+      _controller.loadBookmarkState(listingId);
     } else {
       print('Property id is missing.');
     }
   }
 
+  // Helper function to parse the price by stripping non-numeric characters.
+  num parsePrice(String priceString) {
+    final digitsOnly = priceString.replaceAll(RegExp(r'[^\d.]'), '');
+    return num.tryParse(digitsOnly) ?? 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final theme = Theme.of(context);
     final bool isRent = (widget.property['type']?.toLowerCase() == 'rent');
+
+    final rawPrice = widget.property['price'];
+    final num priceValue =
+    rawPrice != null ? parsePrice(rawPrice) : 0; // Use helper function.
+    final formattedPrice = NumberFormat('#,###').format(priceValue);
 
     return ChangeNotifierProvider<DetailsController>.value(
       value: _controller,
@@ -84,9 +95,12 @@ class _DetailsPageState extends State<DetailsPage> with AutomaticKeepAliveClient
                               top: MediaQuery.of(context).padding.top + 8,
                               right: 16,
                               child: RoundedIconButton(
-                                icon: controller.isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+                                icon: controller.isBookmarked
+                                    ? Icons.bookmark
+                                    : Icons.bookmark_border,
                                 onPressed: () async {
-                                  await controller.toggleBookmark(Listing.fromMap(widget.property));
+                                  await controller.toggleBookmark(
+                                      Listing.fromMap(widget.property));
                                 },
                               ),
                             ),
@@ -97,9 +111,9 @@ class _DetailsPageState extends State<DetailsPage> with AutomaticKeepAliveClient
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    widget.property['price'] != null && isRent
-                                        ? '${widget.property['price']!}/month'
-                                        : widget.property['price'] ?? 'Price not available',
+                                    isRent
+                                        ? '$formattedPrice/month'
+                                        : '$formattedPrice ETB',
                                     style: const TextStyle(
                                       fontSize: 24,
                                       fontWeight: FontWeight.bold,
@@ -123,49 +137,70 @@ class _DetailsPageState extends State<DetailsPage> with AutomaticKeepAliveClient
                     ),
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 24),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            Text(
+                              widget.property['title'] ??
+                                  'No title available',
+                              style: const TextStyle(
+                                  fontSize: 24, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 16),
                             const Text(
                               'Description',
-                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              widget.property['desc'] ?? 'No description available.',
-                              style: const TextStyle(fontSize: 16, color: Colors.grey),
+                              widget.property['desc'] ??
+                                  'No description available.',
+                              style: const TextStyle(
+                                  fontSize: 16, color: Colors.grey),
                             ),
                             const SizedBox(height: 24),
                             UserProfileSection(
-                        property:  widget.property ,
-                              onMessage: (){},
+                              property: widget.property,
+                              onMessage: () {},
                             ),
                             const SizedBox(height: 24),
                             const Text(
                               'Gallery',
-                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 8),
                             controller.isGalleryLoading
-                                ? const GallerySkeleton(itemCount: 3,)
-                                : controller.galleryImages == null || controller.galleryImages!.isEmpty
-                                ? const Center(child: Text('No gallery images available.'))
+                                ? const GallerySkeleton(itemCount: 3)
+                                : controller.galleryImages == null ||
+                                controller.galleryImages!.isEmpty
+                                ? const Center(
+                                child: Text(
+                                    'No gallery images available.'))
                                 : GallerySection(
                               images: controller.galleryImages!,
                               onImageTap: (index, images) {
-                                showFullScreenGallery(context, index, images);
+                                showFullScreenGallery(
+                                    context, index, images);
                               },
                               onGalleryTap: (images) {
-                                showGalleryBottomSheet(context, images);
+                                showGalleryBottomSheet(
+                                    context, images);
                               },
                             ),
                             const SizedBox(height: 24),
-                            // dart
                             MapView(
-                              latitude: double.tryParse(widget.property['latitude'] ?? '0') ?? 0.0,
-                              longitude: double.tryParse(widget.property['longitude'] ?? '0') ?? 0.0,
-                              title: widget.property['title'] ?? 'Property Location',
+                              latitude: double.tryParse(
+                                  widget.property['latitude'] ?? '0') ??
+                                  0.0,
+                              longitude: double.tryParse(
+                                  widget.property['longitude'] ?? '0') ??
+                                  0.0,
+                              title: widget.property['title'] ??
+                                  'Property Location',
                             ),
                             const SizedBox(height: 100),
                           ],
@@ -179,7 +214,8 @@ class _DetailsPageState extends State<DetailsPage> with AutomaticKeepAliveClient
                   right: 0,
                   bottom: 0,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 18, vertical: 10),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       boxShadow: const [
@@ -197,19 +233,22 @@ class _DetailsPageState extends State<DetailsPage> with AutomaticKeepAliveClient
                           children: [
                             const Text(
                               'Price',
-                              style: TextStyle(fontSize: 14, color: Colors.grey),
+                              style: TextStyle(
+                                  fontSize: 14, color: Colors.grey),
                             ),
                             Text(
-                              widget.property['price'] != null && isRent
-                                  ? widget.property['price']! + '/month'
-                                  : widget.property['price'] ?? '',
-                              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                              isRent
+                                  ? '$formattedPrice/month'
+                                  : formattedPrice,
+                              style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
                         const Spacer(),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 13, vertical: 4),
                           width: 150,
                           decoration: BoxDecoration(
                             color: Colors.black87,
@@ -220,9 +259,10 @@ class _DetailsPageState extends State<DetailsPage> with AutomaticKeepAliveClient
                               // Button action.
                             },
                             child: Text(
-                              isRent ? 'Rent Now' : 'Buy Now',
+                              isRent ? 'Rent Now' : 'Schedule Tour',
                               textAlign: TextAlign.center,
-                              style: const TextStyle(color: Colors.white, fontSize: 16),
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 16),
                             ),
                           ),
                         ),

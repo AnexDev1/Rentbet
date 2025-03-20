@@ -1,11 +1,16 @@
 // lib/views/profile/widgets/sign_out_button.dart
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:rentbet/services/user_service.dart';
 import 'package:rentbet/views/auth/auth_page.dart';
 import '../../../services/auth_service.dart';
+import '../../providers/user_provider.dart';
 
 class SignOutButton extends StatelessWidget {
-  const SignOutButton({Key? key}) : super(key: key);
-
+  const SignOutButton({super.key});
+void logout (context){
+  Provider.of<UserProvider>(context).clearUser();
+}
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -100,7 +105,12 @@ class SignOutButton extends StatelessWidget {
                     ),
                     const SizedBox(width: 8.0),
                     ElevatedButton(
-                      onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context)=> AuthPage(),),),
+                      onPressed: () => {
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context)=> AuthPage(),
+                        ),
+                        ),
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.redAccent,
                         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
@@ -125,6 +135,7 @@ class SignOutButton extends StatelessWidget {
 
           // If confirmed, sign out
           if (confirm && context.mounted) {
+
             try {
               await AuthService().signOut();
               // Navigate to login or handle in your auth state listener
